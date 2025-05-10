@@ -7,6 +7,8 @@ import io
 import time
 from tkinter import font as tkfont
 from tkinter import ttk
+import json
+from datetime import datetime
 
 class ModernParentMonitorApp:
     def __init__(self, root):
@@ -14,14 +16,15 @@ class ModernParentMonitorApp:
         self.root.title("Parent Monitoring System")
         self.root.geometry("1280x800")
         
-        # Set modern theme and colors
-        self.bg_color = "#F0F2F5"
-        self.accent_color = "#3498DB"
-        self.text_color = "#2C3E50"
-        self.secondary_color = "#7F8C8D"
-        self.highlight_color = "#E3F2FD"
-        self.warning_color = "#E74C3C"
-        self.success_color = "#2ECC71"
+        # Set modern theme and colors - updated to match the image theme
+        self.bg_color = "#14142B"  # Dark blue background
+        self.accent_color = "#4361EE"  # Brighter blue accent
+        self.secondary_accent = "#F72585"  # Pink accent
+        self.text_color = "#FFFFFF"  # White text
+        self.secondary_color = "#A0A0C0"  # Light purple/gray
+        self.highlight_color = "#2E2E5A"  # Slightly lighter blue for highlights
+        self.warning_color = "#F72585"  # Pink for warnings
+        self.success_color = "#4CC9F0"  # Cyan for success
         
         # Custom fonts
         self.title_font = tkfont.Font(family="Segoe UI", size=14, weight="bold")
@@ -59,7 +62,7 @@ class ModernParentMonitorApp:
         self.connection_indicator = tk.Canvas(self.status_frame, width=15, height=15, 
                                             bg=self.accent_color, highlightthickness=0)
         self.connection_indicator.pack(side=tk.LEFT, padx=(0, 10))
-        self.connection_indicator.create_oval(2, 2, 13, 13, fill="#E74C3C", tags="indicator")
+        self.connection_indicator.create_oval(2, 2, 13, 13, fill=self.warning_color, tags="indicator")
         
         self.status_var = tk.StringVar()
         self.status_var.set("Disconnected")
@@ -82,12 +85,12 @@ class ModernParentMonitorApp:
         self.view_frame.pack(fill=tk.BOTH, expand=True)
         
         # Screen display with border
-        self.screen_frame = tk.Frame(self.view_frame, bg="#FFFFFF", bd=1, relief=tk.SOLID)
+        self.screen_frame = tk.Frame(self.view_frame, bg=self.highlight_color, bd=1, relief=tk.SOLID)
         self.screen_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
         # Screen label for the main display
-        self.screen_label = tk.Label(self.screen_frame, bg="#333333", text="No screen capture yet", 
-                                  fg="#FFFFFF", font=self.normal_font)
+        self.screen_label = tk.Label(self.screen_frame, bg="#111122", text="No screen capture yet", 
+                                  fg=self.secondary_color, font=self.normal_font)
         self.screen_label.pack(fill=tk.BOTH, expand=True)
         
         # Current window info
@@ -102,8 +105,20 @@ class ModernParentMonitorApp:
         self.right_panel = tk.Frame(self.content_frame, bg=self.bg_color, width=350)
         self.right_panel.pack(side=tk.RIGHT, fill=tk.BOTH, padx=(20, 0))
         
+        # Notebook for tabs (Apps, Search History, etc.)
+        self.notebook = ttk.Notebook(self.right_panel)
+        self.notebook.pack(fill=tk.BOTH, expand=True)
+        
+        # Apps tab
+        self.apps_tab = tk.Frame(self.notebook, bg=self.bg_color)
+        self.notebook.add(self.apps_tab, text="Applications")
+        
+        # Search History tab
+        self.history_tab = tk.Frame(self.notebook, bg=self.bg_color)
+        self.notebook.add(self.history_tab, text="Browser History")
+        
         # Apps list panel with title
-        self.apps_frame = tk.LabelFrame(self.right_panel, text="Open Applications", 
+        self.apps_frame = tk.LabelFrame(self.apps_tab, text="Open Applications", 
                                       font=self.subtitle_font, bg=self.bg_color, fg=self.text_color,
                                       padx=10, pady=10)
         self.apps_frame.pack(fill=tk.BOTH, expand=True)
@@ -121,11 +136,11 @@ class ModernParentMonitorApp:
         self.search_button.pack(side=tk.RIGHT, padx=(10, 0))
         
         # Windows list with scrollbar
-        self.windows_list_frame = tk.Frame(self.apps_frame, bg="#FFFFFF", bd=1, relief=tk.SOLID)
+        self.windows_list_frame = tk.Frame(self.apps_frame, bg=self.highlight_color, bd=1, relief=tk.SOLID)
         self.windows_list_frame.pack(fill=tk.BOTH, expand=True)
         
         # Scrollable container for window buttons
-        self.windows_canvas = tk.Canvas(self.windows_list_frame, bg="#FFFFFF", highlightthickness=0)
+        self.windows_canvas = tk.Canvas(self.windows_list_frame, bg=self.highlight_color, highlightthickness=0)
         self.windows_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
         # Scrollbar for windows list
@@ -135,7 +150,7 @@ class ModernParentMonitorApp:
         self.windows_canvas.configure(yscrollcommand=self.windows_scrollbar.set)
         
         # Frame inside canvas for buttons
-        self.windows_container = tk.Frame(self.windows_canvas, bg="#FFFFFF")
+        self.windows_container = tk.Frame(self.windows_canvas, bg=self.highlight_color)
         self.windows_canvas_window = self.windows_canvas.create_window((0, 0), 
                                                                      window=self.windows_container,
                                                                      anchor=tk.NW)
@@ -147,6 +162,9 @@ class ModernParentMonitorApp:
         self.windows_canvas.bind("<Configure>", 
                                lambda e: self.windows_canvas.itemconfig(
                                    self.windows_canvas_window, width=e.width))
+        
+        # Setup search history tab
+        self.setup_history_tab()
         
         # Bottom control panel
         self.control_panel = tk.Frame(self.main_frame, bg=self.accent_color, height=70)
@@ -174,10 +192,17 @@ class ModernParentMonitorApp:
         
         # Refresh apps list button
         self.refresh_button = tk.Button(self.left_controls, text="Refresh Apps List",
-                                      font=self.normal_font, bg="#9B59B6", fg="white",
+                                      font=self.normal_font, bg="#7209B7", fg="white",
                                       padx=15, pady=8, relief=tk.FLAT, bd=0,
                                       command=self.request_windows_list)
         self.refresh_button.pack(side=tk.LEFT, padx=10)
+
+        # Get history button
+        self.history_button = tk.Button(self.left_controls, text="Get Search History",
+                                      font=self.normal_font, bg="#3F37C9", fg="white",
+                                      padx=15, pady=8, relief=tk.FLAT, bd=0,
+                                      command=self.request_browser_history)
+        self.history_button.pack(side=tk.LEFT, padx=10)
         
         # Right side controls
         self.right_controls = tk.Frame(self.control_panel, bg=self.accent_color)
@@ -185,7 +210,7 @@ class ModernParentMonitorApp:
         
         # Pause screen button
         self.pause_button = tk.Button(self.right_controls, text="Pause Screen",
-                                    font=self.normal_font, bg="#FF9800", fg="white",
+                                    font=self.normal_font, bg="#F72585", fg="white",
                                     padx=15, pady=8, relief=tk.FLAT, bd=0,
                                     command=self.pause_screen)
         self.pause_button.pack(side=tk.RIGHT)
@@ -201,6 +226,7 @@ class ModernParentMonitorApp:
         self.screen_paused = False
         self.windows_list = []
         self.active_window_id = None
+        self.browser_history = []
         
         # Initialize with some sample applications
         self.sample_windows = {
@@ -211,18 +237,104 @@ class ModernParentMonitorApp:
             5: {"title": "File Explorer", "process": "explorer.exe", "id": 5}
         }
         
+        # Sample browser history
+        self.sample_history = [
+            {"time": "14:32:05", "url": "www.minecraft.net/community", "title": "Minecraft Community | Minecraft"},
+            {"time": "14:28:12", "url": "www.google.com/search?q=minecraft+diamond+locations", "title": "minecraft diamond locations - Google Search"},
+            {"time": "14:25:30", "url": "www.youtube.com/watch?v=dQw4w9WgXcQ", "title": "How to Beat Minecraft Fast - YouTube"},
+            {"time": "14:15:22", "url": "www.google.com/search?q=homework+answers", "title": "homework answers - Google Search"},
+            {"time": "14:10:15", "url": "www.roblox.com/games", "title": "Games - Roblox"},
+            {"time": "13:58:40", "url": "www.discord.com", "title": "Discord | Your Place to Talk and Hang Out"},
+            {"time": "13:45:12", "url": "www.google.com/search?q=math+homework+solver", "title": "math homework solver - Google Search"},
+            {"time": "13:30:05", "url": "www.google.com", "title": "Google"}
+        ]
+        
         # Display sample data
         self.root.after(100, self.load_sample_data)
         
+    def setup_history_tab(self):
+        # History frame setup
+        self.history_frame = tk.LabelFrame(self.history_tab, text="Browser History", 
+                                         font=self.subtitle_font, bg=self.bg_color, fg=self.text_color,
+                                         padx=10, pady=10)
+        self.history_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # Search box for history
+        self.history_search_frame = tk.Frame(self.history_frame, bg=self.bg_color)
+        self.history_search_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        self.history_search_var = tk.StringVar()
+        self.history_search_entry = ttk.Entry(self.history_search_frame, textvariable=self.history_search_var, 
+                                            font=self.normal_font)
+        self.history_search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        
+        self.history_search_button = ttk.Button(self.history_search_frame, text="Search", 
+                                              style="TButton")
+        self.history_search_button.pack(side=tk.RIGHT, padx=(10, 0))
+        
+        # History list with scrollbar
+        self.history_list_frame = tk.Frame(self.history_frame, bg=self.highlight_color, bd=1, relief=tk.SOLID)
+        self.history_list_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # Create tree view for history
+        columns = ('time', 'title', 'url')
+        self.history_tree = ttk.Treeview(self.history_list_frame, columns=columns, show='headings')
+        
+        # Define headings
+        self.history_tree.heading('time', text='Time')
+        self.history_tree.heading('title', text='Page Title')
+        self.history_tree.heading('url', text='URL')
+        
+        # Define columns
+        self.history_tree.column('time', width=70)
+        self.history_tree.column('title', width=150)
+        self.history_tree.column('url', width=200)
+        
+        # Add scrollbar
+        self.history_scrollbar = ttk.Scrollbar(self.history_list_frame, orient=tk.VERTICAL, 
+                                             command=self.history_tree.yview)
+        self.history_tree.configure(yscroll=self.history_scrollbar.set)
+        
+        # Pack elements
+        self.history_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.history_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        # Highlight suspicious searches
+        self.highlight_suspicious_patterns = ['game', 'minecraft', 'cheat', 'play', 'youtube', 'roblox', 'discord']
+    
     def load_sample_data(self):
-        # Just for demo purposes
+        # Load windows list
         self.update_windows_list(self.sample_windows)
         
-        # Load sample screen image
-        sample_bg = Image.new('RGB', (800, 500), color='#333333')
+        # Load search history
+        self.update_browser_history(self.sample_history)
+        
+        # Load sample screen image - create gradient background
+        width, height = 800, 500
+        sample_bg = self.create_gradient_image(width, height, "#111122", "#222244")
+        
+        # Add minecraft logo/interface simulation
+        # This is a simplified representation, not an actual logo
         photo = ImageTk.PhotoImage(sample_bg)
         self.screen_label.config(image=photo)
-        self.screen_label.image = photo
+        self.screen_label.image = photo  # Keep a reference
+        
+    def create_gradient_image(self, width, height, color1, color2):
+        """Create a gradient image from color1 to color2"""
+        base = Image.new('RGB', (width, height), color1)
+        
+        # Create a gradient overlay
+        for y in range(height):
+            for x in range(width):
+                # Calculate gradient color
+                ratio = y / height
+                r = int((1 - ratio) * int(color1[1:3], 16) + ratio * int(color2[1:3], 16))
+                g = int((1 - ratio) * int(color1[3:5], 16) + ratio * int(color2[3:5], 16))
+                b = int((1 - ratio) * int(color1[5:7], 16) + ratio * int(color2[5:7], 16))
+                
+                base.putpixel((x, y), (r, g, b))
+                
+        return base
         
     def start_server(self):
         if not self.server_running:
@@ -246,7 +358,7 @@ class ModernParentMonitorApp:
             
         # Update UI
         self.status_var.set("Disconnected")
-        self.connection_indicator.itemconfig("indicator", fill="#E74C3C")  # Red for disconnected
+        self.connection_indicator.itemconfig("indicator", fill=self.warning_color)  # Red for disconnected
         self.connect_button.config(state=tk.NORMAL)
         self.disconnect_button.config(state=tk.DISABLED)
         
@@ -292,9 +404,9 @@ class ModernParentMonitorApp:
     def update_connection_status(self, status_text):
         self.status_var.set(status_text)
         if "Connected" in status_text:
-            self.connection_indicator.itemconfig("indicator", fill="#2ECC71")  # Green for connected
+            self.connection_indicator.itemconfig("indicator", fill=self.success_color)  # Cyan for connected
         elif "error" in status_text:
-            self.connection_indicator.itemconfig("indicator", fill="#E74C3C")  # Red for error
+            self.connection_indicator.itemconfig("indicator", fill=self.warning_color)  # Red for error
     
     def receive_data(self):
         while self.server_running and self.client_socket:
@@ -324,6 +436,8 @@ class ModernParentMonitorApp:
                     self.process_screen_capture(data)
                 elif msg_type == b'\x02':  # Windows list
                     self.process_windows_list(data)
+                elif msg_type == b'\x03':  # Browser history
+                    self.process_browser_history(data)
                 
             except Exception as e:
                 if self.server_running:
@@ -373,6 +487,18 @@ class ModernParentMonitorApp:
             if self.server_running:
                 self.root.after(0, lambda: self.update_connection_status(f"Error processing apps list: {str(e)}"))
     
+    def process_browser_history(self, data):
+        try:
+            # Deserialize the browser history
+            history_data = pickle.loads(data)
+            
+            # Update the UI from the main thread
+            self.root.after(0, lambda: self.update_browser_history(history_data))
+                
+        except Exception as e:
+            if self.server_running:
+                self.root.after(0, lambda: self.update_connection_status(f"Error processing browser history: {str(e)}"))
+    
     def update_windows_list(self, windows_data):
         # Clear existing windows list
         self.clear_windows_list()
@@ -383,7 +509,7 @@ class ModernParentMonitorApp:
             window_process = window_info['process']
             
             # Create a app card frame
-            card_frame = tk.Frame(self.windows_container, bg="white", bd=1, relief=tk.SOLID)
+            card_frame = tk.Frame(self.windows_container, bg=self.highlight_color, bd=1, relief=tk.SOLID)
             card_frame.pack(fill=tk.X, padx=5, pady=5, ipady=5)
             
             # Create app icon frame
@@ -399,17 +525,17 @@ class ModernParentMonitorApp:
             icon_label.pack(fill=tk.BOTH, expand=True)
             
             # App info frame
-            info_frame = tk.Frame(card_frame, bg="white")
+            info_frame = tk.Frame(card_frame, bg=self.highlight_color)
             info_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10), pady=10)
             
             # App title
-            title_label = tk.Label(info_frame, text=window_title, bg="white", 
+            title_label = tk.Label(info_frame, text=window_title, bg=self.highlight_color, 
                                  fg=self.text_color, font=self.normal_font, anchor=tk.W,
                                  justify=tk.LEFT)
             title_label.pack(fill=tk.X, anchor=tk.W)
             
             # App process name
-            process_label = tk.Label(info_frame, text=window_process, bg="white",
+            process_label = tk.Label(info_frame, text=window_process, bg=self.highlight_color,
                                    fg=self.secondary_color, font=self.small_font, anchor=tk.W,
                                    justify=tk.LEFT)
             process_label.pack(fill=tk.X, anchor=tk.W)
@@ -436,167 +562,186 @@ class ModernParentMonitorApp:
             
             # Highlight active window if any
             if self.active_window_id == window_id:
-                card_frame.config(bg=self.highlight_color)
-                info_frame.config(bg=self.highlight_color)
-                title_label.config(bg=self.highlight_color)
-                process_label.config(bg=self.highlight_color)
-            
-            # Special highlight for Minecraft
-            if "minecraft" in window_title.lower() or "minecraft" in window_process.lower():
-                card_frame.config(bd=2, relief=tk.RAISED)
-                title_label.config(fg="#E74C3C", font=("Segoe UI", 10, "bold"))
-    
-    def get_icon_color(self, process_name):
-        # Generate a color based on the process name
-        colors = {
-            'chrome': "#4285F4",
-            'firefox': "#FF9500",
-            'edge': "#0078D7",
-            'notepad': "#1ABC9C",
-            'word': "#2B579A",
-            'excel': "#217346",
-            'powerpoint': "#D24726",
-            'outlook': "#0078D4",
-            'teams': "#6264A7",
-            'explorer': "#FFD700",
-            'minecraft': "#5BBD2B",
-            'javaw': "#5BBD2B",
-            'discord': "#7289DA",
-            'steam': "#171A21"
-        }
-        
-        for key in colors:
-            if key in process_name.lower():
-                return colors[key]
-        
-        # Default colors for other processes
-        default_colors = ["#3498DB", "#9B59B6", "#E74C3C", "#16A085", "#27AE60", "#D35400", "#2980B9"]
-        
-        # Generate a consistent color based on the process name
-        index = sum(ord(c) for c in process_name) % len(default_colors)
-        return default_colors[index]
-    
-    def on_hover_enter(self, frame):
-        if frame.cget("bg") != self.highlight_color:
-            frame.config(bg="#F5F5F5")
-            for widget in frame.winfo_children():
-                if isinstance(widget, tk.Frame) and not widget.winfo_children()[0].cget("bg") in [self.accent_color, "#5BBD2B", "#4285F4"]:
-                    widget.config(bg="#F5F5F5")
-                    for child in widget.winfo_children():
-                        if isinstance(child, tk.Label):
-                            child.config(bg="#F5F5F5")
-
-    def on_hover_leave(self, frame, window_id):
-        if window_id != self.active_window_id:
-            frame.config(bg="white")
-            for widget in frame.winfo_children():
-                if isinstance(widget, tk.Frame) and not widget.winfo_children()[0].cget("bg") in [self.accent_color, "#5BBD2B", "#4285F4"]:
-                    widget.config(bg="white")
-                    for child in widget.winfo_children():
-                        if isinstance(child, tk.Label):
-                            child.config(bg="white")
+                self.highlight
+                self.highlight_active_window(card_frame, True)
     
     def clear_windows_list(self):
-        for widget in self.windows_container.winfo_children():
-            widget.destroy()
+        # Clear all widgets from windows container
+        for child in self.windows_container.winfo_children():
+            child.destroy()
         self.windows_list = []
     
+    def get_icon_color(self, process_name):
+        # Get a deterministic color based on process name
+        process_name = process_name.lower()
+        
+        # Predefined colors for common applications
+        colors = {
+            "chrome": "#4285F4",  # Google blue
+            "firefox": "#FF9400",  # Firefox orange
+            "explorer": "#0078D7",  # Windows blue
+            "discord": "#7289DA",  # Discord purple
+            "javaw": "#5cb85c",  # Green for Minecraft
+            "notepad": "#1e88e5",  # Blue for Notepad
+            "msedge": "#0078D7",  # Edge blue
+        }
+        
+        # Check for matches
+        for app, color in colors.items():
+            if app in process_name:
+                return color
+        
+        # Generate a color based on the first letter
+        if process_name:
+            hash_value = hash(process_name[0].lower())
+            # Generate colors in a nice range (avoid too light or too dark)
+            r = (hash_value & 0xFF) % 128 + 64
+            g = ((hash_value >> 8) & 0xFF) % 128 + 64
+            b = ((hash_value >> 16) & 0xFF) % 128 + 64
+            return f"#{r:02x}{g:02x}{b:02x}"
+        
+        return self.accent_color  # Default fallback
+    
     def select_window(self, window_id):
-        # Update active window ID
+        # Handle window selection
         self.active_window_id = window_id
         
-        # Update UI to highlight selected window
+        # Update all window frames to remove highlights from others
         for wid, frame in self.windows_list:
             if wid == window_id:
-                frame.config(bg=self.highlight_color)
-                for widget in frame.winfo_children():
-                    if isinstance(widget, tk.Frame) and not widget.winfo_children()[0].cget("bg") in [self.accent_color, "#5BBD2B", "#4285F4"]:
-                        widget.config(bg=self.highlight_color)
-                        for child in widget.winfo_children():
-                            if isinstance(child, tk.Label):
-                                child.config(bg=self.highlight_color)
+                self.highlight_active_window(frame, True)
+                
+                # Request screenshot for the selected window
+                self.request_window_screenshot(window_id)
+                
+                # Update current view label
+                for w_id, info in self.sample_windows.items():
+                    if w_id == window_id:
+                        self.view_label.config(text=f"Current View: {info['title']}")
+                        break
             else:
-                frame.config(bg="white")
-                for widget in frame.winfo_children():
-                    if isinstance(widget, tk.Frame) and not widget.winfo_children()[0].cget("bg") in [self.accent_color, "#5BBD2B", "#4285F4"]:
-                        widget.config(bg="white")
-                        for child in widget.winfo_children():
-                            if isinstance(child, tk.Label):
-                                child.config(bg="white")
+                self.highlight_active_window(frame, False)
+    
+    def highlight_active_window(self, frame, is_active):
+        # Highlight the active window
+        if is_active:
+            frame.config(bg=self.accent_color)
+            for child in frame.winfo_children():
+                if isinstance(child, tk.Frame) and not child.winfo_children()[0].cget("text").isalpha():
+                    # Skip the icon frame
+                    continue
+                child.config(bg=self.accent_color)
+                
+                for grandchild in child.winfo_children():
+                    if isinstance(grandchild, tk.Label):
+                        grandchild.config(bg=self.accent_color)
+        else:
+            frame.config(bg=self.highlight_color)
+            for child in frame.winfo_children():
+                if isinstance(child, tk.Frame) and child.winfo_children() and not child.winfo_children()[0].cget("text").isalpha():
+                    # Skip the icon frame
+                    continue
+                child.config(bg=self.highlight_color)
+                
+                for grandchild in child.winfo_children():
+                    if isinstance(grandchild, tk.Label):
+                        grandchild.config(bg=self.highlight_color)
+    
+    def on_hover_enter(self, frame):
+        # Highlight on hover
+        if self.active_window_id is None or frame not in [f for _, f in self.windows_list if _ == self.active_window_id]:
+            frame.config(bg="#3E3E7E")  # Slightly lighter than highlight color
+            for child in frame.winfo_children():
+                if isinstance(child, tk.Frame) and child.winfo_children() and not child.winfo_children()[0].cget("text").isalpha():
+                    # Skip the icon frame
+                    continue
+                child.config(bg="#3E3E7E")
+                
+                for grandchild in child.winfo_children():
+                    if isinstance(grandchild, tk.Label):
+                        grandchild.config(bg="#3E3E7E")
+    
+    def on_hover_leave(self, frame, window_id):
+        # Remove highlight on mouse leave, but keep for active window
+        if window_id != self.active_window_id:
+            frame.config(bg=self.highlight_color)
+            for child in frame.winfo_children():
+                if isinstance(child, tk.Frame) and child.winfo_children() and not child.winfo_children()[0].cget("text").isalpha():
+                    # Skip the icon frame
+                    continue
+                child.config(bg=self.highlight_color)
+                
+                for grandchild in child.winfo_children():
+                    if isinstance(grandchild, tk.Label):
+                        grandchild.config(bg=self.highlight_color)
+    
+    def update_browser_history(self, history_data):
+        # Clear current history
+        for item in self.history_tree.get_children():
+            self.history_tree.delete(item)
         
-        # Send command to client to focus on this window (if connected)
-        if self.client_socket and self.server_running:
-            try:
-                command = b'\x01' + window_id.to_bytes(8, byteorder='big')
-                self.client_socket.sendall(command)
-            except Exception as e:
-                self.update_connection_status(f"Error selecting window: {str(e)}")
+        # Add new history items
+        for item in history_data:
+            # Check if the entry contains suspicious terms
+            is_suspicious = False
+            for pattern in self.highlight_suspicious_patterns:
+                if pattern.lower() in item['url'].lower() or pattern.lower() in item['title'].lower():
+                    is_suspicious = True
+                    break
+            
+            item_id = self.history_tree.insert('', tk.END, values=(item['time'], item['title'], item['url']))
+            
+            # Highlight suspicious entries
+            if is_suspicious:
+                self.history_tree.item(item_id, tags=('suspicious',))
         
-        # Update view label with window title
-        for window_id, window_info in self.sample_windows.items():
-            if window_id == self.active_window_id:
-                self.view_label.config(text=f"Current View: {window_info['title']}")
-                break
+        # Configure tag appearance
+        self.history_tree.tag_configure('suspicious', background=self.warning_color, foreground='white')
     
     def request_windows_list(self):
         if self.client_socket and self.server_running:
             try:
-                # Send command to request windows list
-                command = b'\x02'
-                self.client_socket.sendall(command)
-                self.update_connection_status("Refreshing applications list...")
-            except Exception as e:
-                self.update_connection_status(f"Error requesting apps list: {str(e)}")
+                # Send request for windows list (message type 0x02)
+                request = b'\x02' + (0).to_bytes(8, byteorder='big')
+                self.client_socket.sendall(request)
+            except:
+                # If not connected to client, use sample data
+                self.update_windows_list(self.sample_windows)
+        else:
+            # If not connected to client, use sample data
+            self.update_windows_list(self.sample_windows)
     
-    def pause_screen(self):
+    def request_window_screenshot(self, window_id):
         if self.client_socket and self.server_running:
             try:
-                # Toggle pause state
-                self.screen_paused = not self.screen_paused
-                
-                # Send pause command to client
-                command = b'\x03' + (b'\x01' if self.screen_paused else b'\x00')
-                self.client_socket.sendall(command)
-                
-                # Update button text and color
-                if self.screen_paused:
-                    self.pause_button.config(text="Resume Screen", bg=self.success_color)
-                    self.update_connection_status("Screen paused - Message displayed to student")
-                else:
-                    self.pause_button.config(text="Pause Screen", bg="#FF9800")
-                    self.update_connection_status("Screen resumed")
-                    
-                # Show a sample of the pause screen
-                if self.screen_paused:
-                    self.show_pause_sample()
-                
+                # Send request for specific window screenshot (message type 0x01)
+                request = b'\x01' + window_id.to_bytes(8, byteorder='big')
+                self.client_socket.sendall(request)
             except Exception as e:
-                self.update_connection_status(f"Error toggling screen pause: {str(e)}")
+                self.update_connection_status(f"Error requesting screenshot: {str(e)}")
+    
+    def request_browser_history(self):
+        if self.client_socket and self.server_running:
+            try:
+                # Send request for browser history (message type 0x03)
+                request = b'\x03' + (0).to_bytes(8, byteorder='big')
+                self.client_socket.sendall(request)
+            except:
+                # If not connected to client, use sample data
+                self.update_browser_history(self.sample_history)
         else:
-            # For demo purposes, show the pause screen sample
-            self.screen_paused = not self.screen_paused
-            if self.screen_paused:
-                self.pause_button.config(text="Resume Screen", bg=self.success_color)
-                self.show_pause_sample()
-            else:
-                self.pause_button.config(text="Pause Screen", bg="#FF9800")
-                # Restore sample screen
-                self.load_sample_data()
-                
-    def show_pause_sample(self):
-        # Create a sample pause screen
-        width, height = 800, 500  # Adjust to match your actual screen size
-        pause_img = Image.new('RGB', (width, height), color='#777777')
-        
-        # Convert to PhotoImage for display
-        photo = ImageTk.PhotoImage(pause_img)
-        self.screen_label.config(image=photo)
-        self.screen_label.image = photo  # Keep a reference
-        
-        # Add message overlay
-        self.screen_label.config(compound=tk.CENTER, 
-                              text="Nice try, but not good enough!",
-                              font=("Impact", 36), fg="#FF0000")
+            # If not connected to client, use sample data
+            self.update_browser_history(self.sample_history)
+    
+    def pause_screen(self):
+        self.screen_paused = not self.screen_paused
+        if self.screen_paused:
+            self.pause_button.config(text="Resume Screen")
+        else:
+            self.pause_button.config(text="Pause Screen")
+            # Request current window again if not paused
+            if self.active_window_id is not None:
+                self.request_window_screenshot(self.active_window_id)
 
 def main():
     root = tk.Tk()

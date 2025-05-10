@@ -1,7 +1,7 @@
 import socket
 import pickle
 import tkinter as tk
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageDraw, ImageFilter, ImageEnhance
 import threading
 import io
 import time
@@ -9,211 +9,56 @@ from tkinter import font as tkfont
 from tkinter import ttk
 import json
 from datetime import datetime
+import math
+import random
 
-class ModernParentMonitorApp:
+class FuturisticParentMonitorApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Parent Monitoring System")
+        self.root.title("GUARDIAN - Advanced Monitoring System")
         self.root.geometry("1280x800")
         
-        # Set modern theme and colors - updated to match the image theme
-        self.bg_color = "#14142B"  # Dark blue background
-        self.accent_color = "#4361EE"  # Brighter blue accent
-        self.secondary_accent = "#F72585"  # Pink accent
+        # Set futuristic theme and colors - 2040 style
+        self.bg_color = "#0B0B1E"  # Deep space background
+        self.secondary_bg = "#1A1A3A"  # Slightly lighter background
+        self.accent_primary = "#4361EE"  # Bright blue accent
+        self.accent_secondary = "#F72585"  # Neon pink accent
+        self.accent_tertiary = "#4CC9F0"  # Cyan accent
+        self.accent_quaternary = "#7209B7"  # Deep purple accent
         self.text_color = "#FFFFFF"  # White text
-        self.secondary_color = "#A0A0C0"  # Light purple/gray
-        self.highlight_color = "#2E2E5A"  # Slightly lighter blue for highlights
-        self.warning_color = "#F72585"  # Pink for warnings
-        self.success_color = "#4CC9F0"  # Cyan for success
+        self.secondary_text = "#A0A0C0"  # Light purple/gray text
+        self.panel_bg = "#202045"  # Panel background
+        self.highlight_color = "#2E2E5A"  # Highlight color
         
         # Custom fonts
-        self.title_font = tkfont.Font(family="Segoe UI", size=14, weight="bold")
-        self.subtitle_font = tkfont.Font(family="Segoe UI", size=12, weight="bold")
-        self.normal_font = tkfont.Font(family="Segoe UI", size=10)
-        self.small_font = tkfont.Font(family="Segoe UI", size=9)
+        self.title_font = tkfont.Font(family="Segoe UI", size=18, weight="bold")
+        self.subtitle_font = tkfont.Font(family="Segoe UI", size=14, weight="bold")
+        self.normal_font = tkfont.Font(family="Segoe UI", size=12)
+        self.small_font = tkfont.Font(family="Segoe UI", size=10)
+        self.button_font = tkfont.Font(family="Segoe UI", size=11, weight="bold")
         
-        # Configure styles for ttk widgets
-        style = ttk.Style()
-        style.theme_use('clam')
+        # Create custom styles for ttk widgets
+        self.configure_styles()
         
-        # Configure ttk button styles
-        style.configure("TButton", font=self.normal_font, background=self.accent_color)
-        style.configure("Accent.TButton", background=self.accent_color)
-        style.configure("Success.TButton", background=self.success_color)
-        style.configure("Warning.TButton", background=self.warning_color)
+        # Create canvas for the main background with gradient effect
+        self.canvas = tk.Canvas(root, highlightthickness=0)
+        self.canvas.pack(fill=tk.BOTH, expand=True)
         
-        # Main container with padding
-        self.main_frame = tk.Frame(root, bg=self.bg_color)
-        self.main_frame.pack(fill=tk.BOTH, expand=True)
+        # Create gradient background
+        self.create_gradient_background()
         
-        # Top header bar
-        self.header_frame = tk.Frame(self.main_frame, bg=self.accent_color, height=60)
-        self.header_frame.pack(fill=tk.X)
-        self.header_frame.pack_propagate(False)
+        # Main container
+        self.main_frame = tk.Frame(self.canvas, bg=self.bg_color)
+        self.canvas.create_window(0, 0, anchor="nw", window=self.main_frame, width=1280, height=800)
         
-        # App title in header
-        tk.Label(self.header_frame, text="Parent Monitoring System", 
-                font=("Segoe UI", 18, "bold"), bg=self.accent_color, fg="white").pack(side=tk.LEFT, padx=20, pady=10)
+        # Create futuristic header
+        self.create_header()
         
-        # Status indicator in header
-        self.status_frame = tk.Frame(self.header_frame, bg=self.accent_color)
-        self.status_frame.pack(side=tk.RIGHT, padx=20, pady=10)
+        # Create main content area
+        self.create_content_area()
         
-        self.connection_indicator = tk.Canvas(self.status_frame, width=15, height=15, 
-                                            bg=self.accent_color, highlightthickness=0)
-        self.connection_indicator.pack(side=tk.LEFT, padx=(0, 10))
-        self.connection_indicator.create_oval(2, 2, 13, 13, fill=self.warning_color, tags="indicator")
-        
-        self.status_var = tk.StringVar()
-        self.status_var.set("Disconnected")
-        self.status_label = tk.Label(self.status_frame, textvariable=self.status_var, 
-                                   font=self.normal_font, bg=self.accent_color, fg="white")
-        self.status_label.pack(side=tk.LEFT)
-        
-        # Create main content frame with padding
-        self.content_frame = tk.Frame(self.main_frame, bg=self.bg_color, padx=20, pady=20)
-        self.content_frame.pack(fill=tk.BOTH, expand=True)
-        
-        # Left panel for screen display (uses 70% of width)
-        self.left_panel = tk.Frame(self.content_frame, bg=self.bg_color)
-        self.left_panel.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        
-        # Screen view panel with title
-        self.view_frame = tk.LabelFrame(self.left_panel, text="Screen View", 
-                                      font=self.subtitle_font, bg=self.bg_color, fg=self.text_color,
-                                      padx=10, pady=10)
-        self.view_frame.pack(fill=tk.BOTH, expand=True)
-        
-        # Screen display with border
-        self.screen_frame = tk.Frame(self.view_frame, bg=self.highlight_color, bd=1, relief=tk.SOLID)
-        self.screen_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-        
-        # Screen label for the main display
-        self.screen_label = tk.Label(self.screen_frame, bg="#111122", text="No screen capture yet", 
-                                  fg=self.secondary_color, font=self.normal_font)
-        self.screen_label.pack(fill=tk.BOTH, expand=True)
-        
-        # Current window info
-        self.window_info_frame = tk.Frame(self.left_panel, bg=self.bg_color, height=40)
-        self.window_info_frame.pack(fill=tk.X, pady=(10, 0))
-        
-        self.view_label = tk.Label(self.window_info_frame, text="Current View: None", 
-                                 font=self.normal_font, bg=self.bg_color, fg=self.text_color)
-        self.view_label.pack(side=tk.LEFT)
-        
-        # Right panel for windows/apps list (uses 30% of width)
-        self.right_panel = tk.Frame(self.content_frame, bg=self.bg_color, width=350)
-        self.right_panel.pack(side=tk.RIGHT, fill=tk.BOTH, padx=(20, 0))
-        
-        # Notebook for tabs (Apps, Search History, etc.)
-        self.notebook = ttk.Notebook(self.right_panel)
-        self.notebook.pack(fill=tk.BOTH, expand=True)
-        
-        # Apps tab
-        self.apps_tab = tk.Frame(self.notebook, bg=self.bg_color)
-        self.notebook.add(self.apps_tab, text="Applications")
-        
-        # Search History tab
-        self.history_tab = tk.Frame(self.notebook, bg=self.bg_color)
-        self.notebook.add(self.history_tab, text="Browser History")
-        
-        # Apps list panel with title
-        self.apps_frame = tk.LabelFrame(self.apps_tab, text="Open Applications", 
-                                      font=self.subtitle_font, bg=self.bg_color, fg=self.text_color,
-                                      padx=10, pady=10)
-        self.apps_frame.pack(fill=tk.BOTH, expand=True)
-        
-        # Search box for filtering apps
-        self.search_frame = tk.Frame(self.apps_frame, bg=self.bg_color)
-        self.search_frame.pack(fill=tk.X, pady=(0, 10))
-        
-        self.search_var = tk.StringVar()
-        self.search_entry = ttk.Entry(self.search_frame, textvariable=self.search_var, 
-                                    font=self.normal_font)
-        self.search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        
-        self.search_button = ttk.Button(self.search_frame, text="Search", style="TButton")
-        self.search_button.pack(side=tk.RIGHT, padx=(10, 0))
-        
-        # Windows list with scrollbar
-        self.windows_list_frame = tk.Frame(self.apps_frame, bg=self.highlight_color, bd=1, relief=tk.SOLID)
-        self.windows_list_frame.pack(fill=tk.BOTH, expand=True)
-        
-        # Scrollable container for window buttons
-        self.windows_canvas = tk.Canvas(self.windows_list_frame, bg=self.highlight_color, highlightthickness=0)
-        self.windows_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        
-        # Scrollbar for windows list
-        self.windows_scrollbar = ttk.Scrollbar(self.windows_list_frame, orient=tk.VERTICAL,
-                                             command=self.windows_canvas.yview)
-        self.windows_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.windows_canvas.configure(yscrollcommand=self.windows_scrollbar.set)
-        
-        # Frame inside canvas for buttons
-        self.windows_container = tk.Frame(self.windows_canvas, bg=self.highlight_color)
-        self.windows_canvas_window = self.windows_canvas.create_window((0, 0), 
-                                                                     window=self.windows_container,
-                                                                     anchor=tk.NW)
-        
-        # Configure canvas resize
-        self.windows_container.bind("<Configure>", 
-                                  lambda e: self.windows_canvas.configure(
-                                      scrollregion=self.windows_canvas.bbox("all")))
-        self.windows_canvas.bind("<Configure>", 
-                               lambda e: self.windows_canvas.itemconfig(
-                                   self.windows_canvas_window, width=e.width))
-        
-        # Setup search history tab
-        self.setup_history_tab()
-        
-        # Bottom control panel
-        self.control_panel = tk.Frame(self.main_frame, bg=self.accent_color, height=70)
-        self.control_panel.pack(side=tk.BOTTOM, fill=tk.X)
-        self.control_panel.pack_propagate(False)
-        
-        # Left side controls
-        self.left_controls = tk.Frame(self.control_panel, bg=self.accent_color)
-        self.left_controls.pack(side=tk.LEFT, padx=20, pady=10)
-        
-        # Start monitoring button
-        self.connect_button = tk.Button(self.left_controls, text="Start Monitoring", 
-                                      font=self.normal_font, bg=self.success_color, fg="white",
-                                      padx=15, pady=8, relief=tk.FLAT, bd=0,
-                                      command=self.start_server)
-        self.connect_button.pack(side=tk.LEFT, padx=(0, 10))
-        
-        # Stop monitoring button
-        self.disconnect_button = tk.Button(self.left_controls, text="Stop Monitoring",
-                                         font=self.normal_font, bg=self.warning_color, fg="white",
-                                         padx=15, pady=8, relief=tk.FLAT, bd=0,
-                                         command=self.stop_server,
-                                         state=tk.DISABLED)
-        self.disconnect_button.pack(side=tk.LEFT, padx=10)
-        
-        # Refresh apps list button
-        self.refresh_button = tk.Button(self.left_controls, text="Refresh Apps List",
-                                      font=self.normal_font, bg="#7209B7", fg="white",
-                                      padx=15, pady=8, relief=tk.FLAT, bd=0,
-                                      command=self.request_windows_list)
-        self.refresh_button.pack(side=tk.LEFT, padx=10)
-
-        # Get history button
-        self.history_button = tk.Button(self.left_controls, text="Get Search History",
-                                      font=self.normal_font, bg="#3F37C9", fg="white",
-                                      padx=15, pady=8, relief=tk.FLAT, bd=0,
-                                      command=self.request_browser_history)
-        self.history_button.pack(side=tk.LEFT, padx=10)
-        
-        # Right side controls
-        self.right_controls = tk.Frame(self.control_panel, bg=self.accent_color)
-        self.right_controls.pack(side=tk.RIGHT, padx=20, pady=10)
-        
-        # Pause screen button
-        self.pause_button = tk.Button(self.right_controls, text="Pause Screen",
-                                    font=self.normal_font, bg="#F72585", fg="white",
-                                    padx=15, pady=8, relief=tk.FLAT, bd=0,
-                                    command=self.pause_screen)
-        self.pause_button.pack(side=tk.RIGHT)
+        # Create control panel
+        self.create_control_panel()
         
         # Server settings
         self.server_ip = "0.0.0.0"  # Listen on all interfaces
@@ -249,504 +94,1148 @@ class ModernParentMonitorApp:
             {"time": "13:30:05", "url": "www.google.com", "title": "Google"}
         ]
         
+        # Start ambient animation
+        self.start_ambient_animation()
+        
         # Display sample data
         self.root.after(100, self.load_sample_data)
         
-    def setup_history_tab(self):
-        # History frame setup
-        self.history_frame = tk.LabelFrame(self.history_tab, text="Browser History", 
-                                         font=self.subtitle_font, bg=self.bg_color, fg=self.text_color,
-                                         padx=10, pady=10)
-        self.history_frame.pack(fill=tk.BOTH, expand=True)
+    def configure_styles(self):
+        """Configure custom styles for ttk widgets"""
+        style = ttk.Style()
+        style.theme_use('clam')
         
-        # Search box for history
-        self.history_search_frame = tk.Frame(self.history_frame, bg=self.bg_color)
-        self.history_search_frame.pack(fill=tk.X, pady=(0, 10))
+        # Configure button styles
+        style.configure("Accent.TButton", 
+                        font=self.button_font, 
+                        background=self.accent_primary, 
+                        foreground="white",
+                        padding=(15, 8))
         
-        self.history_search_var = tk.StringVar()
-        self.history_search_entry = ttk.Entry(self.history_search_frame, textvariable=self.history_search_var, 
-                                            font=self.normal_font)
-        self.history_search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        style.configure("Warning.TButton", 
+                        font=self.button_font, 
+                        background=self.accent_secondary,
+                        foreground="white",
+                        padding=(15, 8))
         
-        self.history_search_button = ttk.Button(self.history_search_frame, text="Search", 
-                                              style="TButton")
-        self.history_search_button.pack(side=tk.RIGHT, padx=(10, 0))
+        style.configure("Success.TButton", 
+                        font=self.button_font, 
+                        background=self.accent_tertiary,
+                        foreground="white",
+                        padding=(15, 8))
         
-        # History list with scrollbar
-        self.history_list_frame = tk.Frame(self.history_frame, bg=self.highlight_color, bd=1, relief=tk.SOLID)
-        self.history_list_frame.pack(fill=tk.BOTH, expand=True)
+        # Configure treeview styles
+        style.configure("Treeview", 
+                        background=self.panel_bg,
+                        foreground=self.text_color,
+                        fieldbackground=self.panel_bg,
+                        borderwidth=0)
         
-        # Create tree view for history
-        columns = ('time', 'title', 'url')
-        self.history_tree = ttk.Treeview(self.history_list_frame, columns=columns, show='headings')
+        style.configure("Treeview.Heading", 
+                        background=self.highlight_color,
+                        foreground=self.text_color,
+                        font=self.normal_font)
         
-        # Define headings
-        self.history_tree.heading('time', text='Time')
-        self.history_tree.heading('title', text='Page Title')
-        self.history_tree.heading('url', text='URL')
+        # Configure entry styles
+        style.configure("TEntry", 
+                        background=self.panel_bg,
+                        foreground=self.text_color,
+                        fieldbackground=self.panel_bg,
+                        insertcolor=self.text_color)
+    
+    def create_gradient_background(self):
+        """Create a gradient background with animated particles"""
+        # Create gradient background
+        width, height = 1280, 800
+        self.bg_image = Image.new('RGBA', (width, height), self.bg_color)
+        draw = ImageDraw.Draw(self.bg_image)
         
-        # Define columns
-        self.history_tree.column('time', width=70)
-        self.history_tree.column('title', width=150)
-        self.history_tree.column('url', width=200)
+        # Create radial gradient
+        for i in range(width + height):
+            # Draw radial gradient from top-left and bottom-right
+            alpha = int(255 - i * 0.1) if i * 0.1 < 255 else 0
+            if alpha > 0:
+                draw.ellipse((0 - i, 0 - i, i, i), 
+                             fill=(67, 97, 238, alpha//10))
+                draw.ellipse((width - i, height - i, width + i, height + i), 
+                             fill=(247, 37, 133, alpha//10))
         
-        # Add scrollbar
-        self.history_scrollbar = ttk.Scrollbar(self.history_list_frame, orient=tk.VERTICAL, 
-                                             command=self.history_tree.yview)
-        self.history_tree.configure(yscroll=self.history_scrollbar.set)
+        # Add some noise texture
+        for _ in range(1000):
+            x = random.randint(0, width - 1)
+            y = random.randint(0, height - 1)
+            alpha = random.randint(5, 30)
+            draw.point((x, y), fill=(255, 255, 255, alpha))
         
-        # Pack elements
-        self.history_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.history_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        # Apply slight blur
+        self.bg_image = self.bg_image.filter(ImageFilter.GaussianBlur(radius=20))
         
-        # Highlight suspicious searches
-        self.highlight_suspicious_patterns = ['game', 'minecraft', 'cheat', 'play', 'youtube', 'roblox', 'discord']
+        # Convert to PhotoImage and display
+        self.bg_photo = ImageTk.PhotoImage(self.bg_image)
+        self.canvas.create_image(0, 0, image=self.bg_photo, anchor="nw")
+        
+        # Add decorative grid lines
+        for i in range(0, width, 100):
+            self.canvas.create_line(i, 0, i, height, fill=f"#{30:02x}{30:02x}{60:02x}", width=1)
+        for i in range(0, height, 100):
+            self.canvas.create_line(0, i, width, i, fill=f"#{30:02x}{30:02x}{60:02x}", width=1)
+    
+    def create_header(self):
+        """Create futuristic curved header bar"""
+        # Header frame
+        self.header_height = 70
+        self.header_frame = tk.Frame(self.main_frame, height=self.header_height)
+        self.header_frame.pack(fill=tk.X)
+        self.header_frame.pack_propagate(False)
+        
+        # Header canvas for curved design
+        self.header_canvas = tk.Canvas(self.header_frame, 
+                                     highlightthickness=0, 
+                                     bg=self.bg_color)
+        self.header_canvas.pack(fill=tk.BOTH, expand=True)
+        
+        # Create gradient header
+        self.draw_curved_header()
+        
+        # App title in header
+        self.header_canvas.create_text(40, 35, 
+                                     text="GUARDIAN", 
+                                     font=self.title_font, 
+                                     fill="white", 
+                                     anchor="w")
+        
+        self.header_canvas.create_text(210, 35, 
+                                      text="Advanced Monitoring System", 
+                                      font=self.normal_font, 
+                                      fill=self.secondary_text, 
+                                      anchor="w")
+        
+        # Status indicator in header
+        self.connection_indicator = self.header_canvas.create_oval(1050, 35, 1070, 55, 
+                                                                fill=self.accent_secondary, 
+                                                                outline="")
+        
+        # Add glow effect to indicator
+        self.header_canvas.create_oval(1048, 33, 1072, 57, 
+                                     fill="", 
+                                     outline=self.accent_secondary, 
+                                     width=2)
+        
+        self.status_var = tk.StringVar()
+        self.status_var.set("Disconnected")
+        self.status_text = self.header_canvas.create_text(1090, 45, 
+                                                       text=self.status_var.get(), 
+                                                       font=self.normal_font, 
+                                                       fill="white", 
+                                                       anchor="w")
+    
+    def draw_curved_header(self):
+        """Draw curved gradient header"""
+        width = self.root.winfo_width()
+        height = self.header_height
+        
+        # Create gradient header image
+        header_img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(header_img)
+        
+        # Draw gradient
+        for i in range(width):
+            # Calculate gradient color
+            r = int(67 + (67 - 48) * i / width)
+            g = int(97 + (97 - 55) * i / width)
+            b = int(238 + (238 - 200) * i / width)
+            draw.line([(i, 0), (i, height)], fill=(r, g, b))
+        
+        # Apply curve at the bottom
+        mask = Image.new('L', (width, height), 0)
+        mask_draw = ImageDraw.Draw(mask)
+        
+        # Draw curve
+        mask_draw.rectangle((0, 0, width, height - 20), fill=255)
+        for x in range(width):
+            y_offset = int(10 * math.sin(math.pi * x / width))
+            mask_draw.rectangle((x, height - 20, x + 1, height - 20 + y_offset), fill=255)
+        
+        # Apply mask
+        header_img.putalpha(mask)
+        
+        # Apply slight blur for smoothness
+        header_img = header_img.filter(ImageFilter.GaussianBlur(radius=1))
+        
+        # Convert to PhotoImage
+        self.header_photo = ImageTk.PhotoImage(header_img)
+        
+        # Display header
+        self.header_canvas.create_image(0, 0, image=self.header_photo, anchor="nw")
+    
+    def create_content_area(self):
+        """Create main content area with screen view and apps list"""
+        # Content frame
+        self.content_frame = tk.Frame(self.main_frame, bg=self.bg_color)
+        self.content_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
+        
+        # Left panel for screen view
+        self.create_screen_panel()
+        
+        # Right panel for applications and tabs
+        self.create_apps_panel()
+    
+    def create_screen_panel(self):
+        """Create left panel for screen view"""
+        # Screen panel - left side (70% width)
+        self.screen_panel = tk.Frame(self.content_frame, bg=self.bg_color)
+        self.screen_panel.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
+        
+        # Canvas for screen view with curved border
+        self.screen_canvas = tk.Canvas(self.screen_panel, 
+                                     highlightthickness=0, 
+                                     bg=self.bg_color)
+        self.screen_canvas.pack(fill=tk.BOTH, expand=True)
+        
+        # Create curved panel for screen
+        self.screen_frame_img = None  # Will hold the image for the frame
+        self.screen_photo = None  # Will hold the photo for the screen content
+        self.screen_item = None  # Will hold canvas item for screen content
+        
+        # Draw initial screen panel
+        self.draw_screen_panel()
+        
+        # Screen title
+        self.screen_canvas.create_text(30, 35, 
+                                     text="LIVE VIEW", 
+                                     font=self.subtitle_font, 
+                                     fill="white", 
+                                     anchor="w")
+        
+        # Add control dots
+        self.screen_canvas.create_oval(self.screen_width - 150, 35, self.screen_width - 140, 45, 
+                                     fill=self.accent_tertiary, outline="")
+        self.screen_canvas.create_oval(self.screen_width - 130, 35, self.screen_width - 120, 45, 
+                                     fill=self.accent_secondary, outline="")
+        self.screen_canvas.create_oval(self.screen_width - 110, 35, self.screen_width - 100, 45, 
+                                     fill=self.accent_primary, outline="")
+        
+        # Current window info at bottom
+        self.view_label_text = "Current View: None"
+        self.view_label = self.screen_canvas.create_text(30, self.screen_height - 30, 
+                                                      text=self.view_label_text, 
+                                                      font=self.normal_font, 
+                                                      fill="white", 
+                                                      anchor="w")
+        
+        # Activity meter
+        self.draw_activity_meter()
+    
+    def draw_activity_meter(self):
+        """Draw activity meter in the screen panel"""
+        # Background
+        self.screen_canvas.create_rounded_rectangle(
+            self.screen_width - 200, self.screen_height - 38,
+            self.screen_width - 50, self.screen_height - 22,
+            radius=8, fill=self.secondary_bg, outline="")
+        
+        # Active part (will be updated)
+        self.activity_meter = self.screen_canvas.create_rounded_rectangle(
+            self.screen_width - 200, self.screen_height - 38,
+            self.screen_width - 120, self.screen_height - 22,
+            radius=8, fill=self.accent_secondary, outline="")
+        
+        # Label
+        self.screen_canvas.create_text(
+            self.screen_width - 125, self.screen_height - 30,
+            text="ACTIVITY", font=self.small_font, fill="white")
+    
+    def draw_screen_panel(self):
+        """Draw screen panel with curved borders"""
+        # Get panel dimensions
+        self.screen_width = self.screen_panel.winfo_width() 
+        if self.screen_width < 100:  # Default size if not yet rendered
+            self.screen_width = 800  
+            
+        self.screen_height = self.screen_panel.winfo_height()
+        if self.screen_height < 100:  # Default size if not yet rendered
+            self.screen_height = 600
+        
+        # Create rounded panel
+        panel_img = Image.new('RGBA', (self.screen_width, self.screen_height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(panel_img)
+        
+        # Main panel background
+        draw.rounded_rectangle(
+            (0, 0, self.screen_width, self.screen_height), 
+            radius=20, 
+            fill=(30, 30, 60, 150))  # Semi-transparent
+        
+        # Header bar
+        draw.rounded_rectangle(
+            (0, 0, self.screen_width, 70),
+            radius=20,
+            fill=(67, 97, 238, 255))
+        
+        # Bottom status bar
+        draw.rounded_rectangle(
+            (0, self.screen_height - 60, self.screen_width, self.screen_height),
+            radius=(0, 0, 20, 20),  # Only round bottom corners
+            fill=(30, 30, 70, 200))
+        
+        # Main screen area
+        self.screen_area = (20, 80, self.screen_width - 20, self.screen_height - 70)
+        draw.rounded_rectangle(
+            self.screen_area,
+            radius=10,
+            fill=(20, 20, 40, 128))  # Semi-transparent
+        
+        # Apply slight blur for a modern look
+        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.5))
+        
+        # Convert to PhotoImage
+        self.screen_frame_img = ImageTk.PhotoImage(panel_img)
+        
+        # Display on canvas
+        self.screen_frame = self.screen_canvas.create_image(
+            0, 0, image=self.screen_frame_img, anchor="nw")
+    
+    def create_apps_panel(self):
+        """Create right panel for applications and tabs"""
+        # Apps panel - right side (30% width)
+        self.apps_panel_width = 350  # Fixed width
+        self.apps_panel = tk.Frame(self.content_frame, bg=self.bg_color, width=self.apps_panel_width)
+        self.apps_panel.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
+        
+        # Canvas for apps panel with curved border
+        self.apps_canvas = tk.Canvas(self.apps_panel, 
+                                   highlightthickness=0, 
+                                   bg=self.bg_color)
+        self.apps_canvas.pack(fill=tk.BOTH, expand=True)
+        
+        # Draw apps panel
+        self.draw_apps_panel()
+        
+        # Create tabbed interface
+        self.create_tab_interface()
+        
+        # Create apps list
+        self.create_apps_list()
+        
+        # Create history tab content
+        self.create_history_tab()
+        
+        # Create analytics panel
+        self.create_analytics_panel()
+    
+    def draw_apps_panel(self):
+        """Draw apps panel with curved borders"""
+        # Get panel dimensions
+        apps_width = self.apps_panel_width
+        apps_height = 600  # Default height
+        
+        # Create rounded panel
+        panel_img = Image.new('RGBA', (apps_width, apps_height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(panel_img)
+        
+        # Main panel background
+        draw.rounded_rectangle(
+            (0, 0, apps_width, apps_height), 
+            radius=20, 
+            fill=(30, 30, 60, 150))  # Semi-transparent
+        
+        # Tab bar
+        draw.rounded_rectangle(
+            (0, 0, apps_width, 50),
+            radius=(20, 20, 0, 0),  # Only round top corners
+            fill=(20, 20, 40, 230))
+        
+        # Active tab
+        draw.rounded_rectangle(
+            (0, 0, apps_width // 2, 50),
+            radius=(20, 20, 0, 0),  # Only round top corners
+            fill=(67, 97, 238, 255))
+        
+        # Apply slight blur for a modern look
+        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.5))
+        
+        # Convert to PhotoImage
+        self.apps_frame_img = ImageTk.PhotoImage(panel_img)
+        
+        # Display on canvas
+        self.apps_frame = self.apps_canvas.create_image(
+            0, 0, image=self.apps_frame_img, anchor="nw")
+    
+    def create_tab_interface(self):
+        """Create tab interface on apps panel"""
+        # Tab labels
+        self.apps_canvas.create_text(
+            self.apps_panel_width // 4, 25,
+            text="APPLICATIONS", font=self.subtitle_font, fill="white")
+        
+        self.apps_canvas.create_text(
+            self.apps_panel_width // 4 * 3, 25,
+            text="HISTORY", font=self.normal_font, fill=self.secondary_text)
+        
+        # Make tabs clickable
+        self.apps_canvas.tag_bind(
+            self.apps_canvas.create_rectangle(
+                0, 0, self.apps_panel_width // 2, 50,
+                fill="", outline=""),
+            "<Button-1>", lambda e: self.switch_tab("apps"))
+        
+        self.apps_canvas.tag_bind(
+            self.apps_canvas.create_rectangle(
+                self.apps_panel_width // 2, 0, self.apps_panel_width, 50,
+                fill="", outline=""),
+            "<Button-1>", lambda e: self.switch_tab("history"))
+    
+    def create_apps_list(self):
+        """Create applications list area"""
+        # Search bar
+        search_bg = self.apps_canvas.create_rounded_rectangle(
+            20, 70, self.apps_panel_width - 20, 110,
+            radius=20, fill=self.panel_bg)
+        
+        # Search icon
+        self.apps_canvas.create_oval(35, 90, 45, 100, outline=self.secondary_text, width=2)
+        self.apps_canvas.create_line(43, 98, 50, 105, fill=self.secondary_text, width=2)
+        
+        # Search text
+    self.apps_canvas.create_text(
+        60, 90, text="Search applications...",
+        font=self.normal_font, fill=self.secondary_text, anchor="w")
+    
+    # Container for app cards
+    self.apps_container = tk.Frame(self.apps_canvas, bg=self.panel_bg)
+    self.apps_container_window = self.apps_canvas.create_window(
+        20, 130, window=self.apps_container,
+        anchor="nw", width=self.apps_panel_width - 40, height=420)
+    
+    # Apps container will be populated with cards
+
+def create_history_tab(self):
+    """Create history tab content (initially hidden)"""
+    # Container for history tab
+    self.history_container = tk.Frame(self.apps_canvas, bg=self.panel_bg)
+    self.history_container_window = self.apps_canvas.create_window(
+        20, 130, window=self.history_container,
+        anchor="nw", width=self.apps_panel_width - 40, height=420)
+    
+    # Hide initially
+    self.apps_canvas.itemconfigure(self.history_container_window, state="hidden")
+    
+    # Search bar for history
+    self.history_search_frame = tk.Frame(self.history_container, bg=self.panel_bg)
+    self.history_search_frame.pack(fill=tk.X, pady=(0, 10))
+    
+    self.history_search_var = tk.StringVar()
+    self.history_search_entry = ttk.Entry(
+        self.history_search_frame, textvariable=self.history_search_var,
+        font=self.normal_font)
+    self.history_search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
+    
+    self.history_search_button = ttk.Button(
+        self.history_search_frame, text="Search", style="Accent.TButton")
+    self.history_search_button.pack(side=tk.RIGHT, padx=(10, 0))
+    
+    # Create tree view for history
+    columns = ('time', 'title', 'url')
+    self.history_tree = ttk.Treeview(
+        self.history_container, columns=columns, show='headings', height=15)
+    
+    # Define headings
+    self.history_tree.heading('time', text='Time')
+    self.history_tree.heading('title', text='Page Title')
+    self.history_tree.heading('url', text='URL')
+    
+    # Define columns
+    self.history_tree.column('time', width=70)
+    self.history_tree.column('title', width=150)
+    self.history_tree.column('url', width=120)
+    
+    # Add scrollbar
+    self.history_scrollbar = ttk.Scrollbar(
+        self.history_container, orient=tk.VERTICAL,
+        command=self.history_tree.yview)
+    self.history_tree.configure(yscroll=self.history_scrollbar.set)
+    
+    # Pack elements
+    self.history_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    self.history_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    
+    # Highlight suspicious searches
+    self.highlight_suspicious_patterns = [
+        'game', 'minecraft', 'cheat', 'play', 'youtube', 'roblox', 'discord']
+    
+    # Configure tag appearance
+    self.history_tree.tag_configure(
+        'suspicious', background=self.accent_secondary, foreground='white')
+    def create_analytics_panel(self):
+        """Create analytics panel below apps list"""
+        # Analytics panel background
+        analytics_bg = self.apps_canvas.create_rounded_rectangle(
+            0, 560, self.apps_panel_width, 690,
+            radius=15, fill=(30, 30, 70, 180))
+        
+        # Header bar
+        analytics_header = self.apps_canvas.create_rounded_rectangle(
+            0, 560, self.apps_panel_width, 600,
+            radius=(15, 15, 0, 0), fill=self.accent_secondary)
+        
+        # Title
+        self.apps_canvas.create_text(
+            20, 580, text="ACTIVITY INSIGHTS",
+            font=self.subtitle_font, fill="white", anchor="w")
+        
+        # Activity graph background
+        graph_bg = self.apps_canvas.create_rounded_rectangle(
+            20, 620, self.apps_panel_width - 20, 680,
+            radius=10, fill=(20, 20, 40, 128))
+        
+        # Draw activity graph
+        self.draw_activity_graph()
+        
+        # Alert message
+        self.apps_canvas.create_text(
+            20, 700, text="Gaming activity detected in the last 15 minutes",
+            font=self.small_font, fill=self.accent_secondary, anchor="w")
+    
+    def draw_activity_graph(self):
+        """Draw activity graph in analytics panel"""
+        # Sample data points for graph
+        points = [
+            (30, 670), (60, 650), (90, 660), (120, 630), (150, 645),
+            (180, 620), (210, 635), (240, 610), (270, 600), (300, 620)
+        ]
+        
+        # Draw connecting line
+        self.apps_canvas.create_line(
+            points, fill=self.accent_secondary, width=2, smooth=True)
+        
+        # Draw points
+        for x, y in points:
+            # Regular points
+            self.apps_canvas.create_oval(
+                x - 3, y - 3, x + 3, y + 3,
+                fill=self.accent_tertiary, outline="")
+        
+        # Highlight current point
+        self.apps_canvas.create_oval(
+            270 - 4, 600 - 4, 270 + 4, 600 + 4,
+            fill=self.accent_secondary, outline="")
+    
+    def create_control_panel(self):
+        """Create bottom control panel"""
+        # Control panel frame
+        self.control_frame = tk.Frame(self.main_frame, bg=self.bg_color, height=80)
+        self.control_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=20, pady=20)
+        
+        # Canvas for control panel with curved border
+        self.control_canvas = tk.Canvas(
+            self.control_frame, highlightthickness=0, bg=self.bg_color, height=80)
+        self.control_canvas.pack(fill=tk.X)
+        
+        # Draw control panel
+        self.draw_control_panel()
+        
+        # Control buttons
+        button_width = 180
+        button_height = 40
+        button_radius = 20
+        button_y = 20
+        
+        # Start Monitoring button
+        start_button_bg = self.control_canvas.create_rounded_rectangle(
+            20, button_y, 20 + button_width, button_y + button_height,
+            radius=button_radius, fill=self.accent_tertiary)
+        
+        self.control_canvas.create_text(
+            20 + button_width // 2, button_y + button_height // 2,
+            text="START MONITORING",
+            font=self.button_font, fill="white")
+        
+        # Make button clickable
+        self.control_canvas.tag_bind(
+            start_button_bg, "<Button-1>", lambda e: self.start_server())
+        
+        # Stop Monitoring button
+        stop_button_bg = self.control_canvas.create_rounded_rectangle(
+            220, button_y, 220 + button_width, button_y + button_height,
+            radius=button_radius, fill=self.accent_secondary)
+        
+        self.control_canvas.create_text(
+            220220 + button_width // 2, button_y + button_height // 2,
+            text="STOP MONITORING",
+            font=self.button_font, fill="white")
+        
+        # Make button clickable
+        self.control_canvas.tag_bind(
+            stop_button_bg, "<Button-1>", lambda e: self.stop_server())
+        
+        # Refresh Apps button
+        refresh_button_bg = self.control_canvas.create_rounded_rectangle(
+            420, button_y, 420 + button_width, button_y + button_height,
+            radius=button_radius, fill=self.accent_quaternary)
+        
+        self.control_canvas.create_text(
+            420 + button_width // 2, button_y + button_height // 2,
+            text="REFRESH APPS LIST",
+            font=self.button_font, fill="white")
+        
+        # Make button clickable
+        self.control_canvas.tag_bind(
+            refresh_button_bg, "<Button-1>", lambda e: self.request_windows_list())
+        
+        # Get History button
+        history_button_bg = self.control_canvas.create_rounded_rectangle(
+            620, button_y, 620 + button_width, button_y + button_height,
+            radius=button_radius, fill=self.panel_bg, outline=self.accent_primary, width=1)
+        
+        self.control_canvas.create_text(
+            620 + button_width // 2, button_y + button_height // 2,
+            text="GET SEARCH HISTORY",
+            font=self.button_font, fill="white")
+        
+        # Make button clickable
+        self.control_canvas.tag_bind(
+            history_button_bg, "<Button-1>", lambda e: self.request_browser_history())
+        
+        # Pause Screen button
+        pause_button_bg = self.control_canvas.create_rounded_rectangle(
+            820, button_y, 820 + button_width, button_y + button_height,
+            radius=button_radius, fill=self.panel_bg, outline=self.accent_secondary, width=1)
+        
+        self.control_canvas.create_text(
+            820 + button_width // 2, button_y + button_height // 2,
+            text="PAUSE SCREEN",
+            font=self.button_font, fill="white")
+        
+        # Make button clickable
+        self.control_canvas.tag_bind(
+            pause_button_bg, "<Button-1>", lambda e: self.pause_screen())
+    
+    def draw_control_panel(self):
+        """Draw control panel with curved borders"""
+        width = self.root.winfo_width() if self.root.winfo_width() > 100 else 1280
+        height = 80
+        
+        # Create rounded panel
+        panel_img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(panel_img)
+        
+        # Main panel background
+        draw.rounded_rectangle(
+            (0, 0, width, height), 
+            radius=20, 
+            fill=(30, 30, 60, 150))  # Semi-transparent
+        
+        # Gradient overlay
+        for i in range(width):
+            # Calculate gradient color
+            r = int(30 + (30 - 20) * i / width)
+            g = int(30 + (30 - 20) * i / width)
+            b = int(60 + (60 - 40) * i / width)
+            alpha = 100 - i // 10 if i < 500 else 0
+            
+            if alpha > 0:
+                draw.line([(i, 0), (i, height)], fill=(r, g, b, alpha))
+        
+        # Apply slight blur for a modern look
+        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.5))
+        
+        # Convert to PhotoImage
+        self.control_frame_img = ImageTk.PhotoImage(panel_img)
+        
+        # Display on canvas
+        self.control_frame_item = self.control_canvas.create_image(
+            0, 0, image=self.control_frame_img, anchor="nw")
     
     def load_sample_data(self):
-        # Load windows list
-        self.update_windows_list(self.sample_windows)
+        """Load sample data for demo purposes"""
+        # Populate apps list with sample windows
+        self.windows_list = list(self.sample_windows.values())
+        self.update_apps_list()
         
-        # Load search history
-        self.update_browser_history(self.sample_history)
+        # Update browser history
+        self.browser_history = self.sample_history
+        self.update_history_list()
         
-        # Load sample screen image - create gradient background
-        width, height = 800, 500
-        sample_bg = self.create_gradient_image(width, height, "#111122", "#222244")
+        # Create sample screen image
+        self.create_sample_screen()
         
-        # Add minecraft logo/interface simulation
-        # This is a simplified representation, not an actual logo
-        photo = ImageTk.PhotoImage(sample_bg)
-        self.screen_label.config(image=photo)
-        self.screen_label.image = photo  # Keep a reference
+        # Update status
+        self.update_status("Ready to connect", "orange")
+    
+    def create_sample_screen(self):
+        """Create a sample screen image"""
+        # Create a sample screen image
+        width = int(self.screen_area[2] - self.screen_area[0])
+        height = int(self.screen_area[3] - self.screen_area[1])
         
-    def create_gradient_image(self, width, height, color1, color2):
-        """Create a gradient image from color1 to color2"""
-        base = Image.new('RGB', (width, height), color1)
+        # Create sample desktop
+        screen_img = Image.new('RGB', (width, height), (30, 30, 50))
+        draw = ImageDraw.Draw(screen_img)
         
-        # Create a gradient overlay
-        for y in range(height):
-            for x in range(width):
-                # Calculate gradient color
-                ratio = y / height
-                r = int((1 - ratio) * int(color1[1:3], 16) + ratio * int(color2[1:3], 16))
-                g = int((1 - ratio) * int(color1[3:5], 16) + ratio * int(color2[3:5], 16))
-                b = int((1 - ratio) * int(color1[5:7], 16) + ratio * int(color2[5:7], 16))
-                
-                base.putpixel((x, y), (r, g, b))
-                
-        return base
+        # Draw desktop background
+        for i in range(0, width, 30):
+            for j in range(0, height, 30):
+                # Create grid
+                alpha = random.randint(20, 40)
+                draw.rectangle((i, j, i+28, j+28), 
+                               fill=(40, 40, 70, alpha))
         
-    def start_server(self):
-        if not self.server_running:
-            self.server_thread = threading.Thread(target=self.run_server)
-            self.server_thread.daemon = True
-            self.server_running = True
-            self.server_thread.start()
+        # Draw some windows
+        draw.rounded_rectangle((50, 50, 350, 250), radius=10, 
+                              fill=(60, 100, 240))
+        draw.rounded_rectangle((60, 80, 340, 240), radius=5, 
+                              fill=(240, 240, 240))
+        draw.text((65, 60), "Minecraft", fill=(255, 255, 255))
+        
+        # Another window
+        draw.rounded_rectangle((200, 150, 500, 350), radius=10, 
+                              fill=(240, 240, 240))
+        draw.rounded_rectangle((200, 150, 500, 180), radius=(10, 10, 0, 0), 
+                              fill=(200, 200, 200))
+        draw.text((210, 160), "Google Chrome", fill=(80, 80, 80))
+        
+        # Taskbar
+        draw.rectangle((0, height-40, width, height), 
+                      fill=(40, 40, 70))
+        
+        # Start button
+        draw.rounded_rectangle((10, height-35, 50, height-5), radius=5, 
+                              fill=(60, 100, 240))
+        
+        # Clock
+        current_time = datetime.now().strftime("%H:%M")
+        draw.text((width-60, height-25), current_time, fill=(255, 255, 255))
+        
+        # Convert to PhotoImage
+        self.screen_photo = ImageTk.PhotoImage(screen_img)
+        
+        # Display on canvas
+        self.screen_item = self.screen_canvas.create_image(
+            self.screen_area[0], self.screen_area[1], 
+            image=self.screen_photo, anchor="nw")
+        
+        # Update current view label
+        self.view_label_text = "Current View: Minecraft"
+        self.screen_canvas.itemconfig(self.view_label, text=self.view_label_text)
+        
+        # Update active window
+        self.active_window_id = 1
+    
+    def start_ambient_animation(self):
+        """Start ambient animation effects"""
+        # Function to update animations
+        def update_animation():
+            # Pulse effect for connection indicator
+            pulse_size = 2 * math.sin(time.time() * 3) + 2
+            self.header_canvas.coords(
+                self.connection_indicator,
+                1050 - pulse_size, 35 - pulse_size, 
+                1070 + pulse_size, 55 + pulse_size)
             
-            # Update UI
-            self.status_var.set("Listening for connection...")
-            self.connection_indicator.itemconfig("indicator", fill="#F39C12")  # Yellow for listening
-            self.connect_button.config(state=tk.DISABLED)
-            self.disconnect_button.config(state=tk.NORMAL)
+            # Update activity meter
+            activity_width = 80 + 30 * math.sin(time.time())
+            self.screen_canvas.coords(
+                self.activity_meter,
+                self.screen_width - 200, self.screen_height - 38,
+                self.screen_width - 200 + activity_width, self.screen_height - 22)
+            
+            # Schedule next update
+            self.root.after(50, update_animation)
+        
+        # Start animation
+        update_animation()
+    
+    def update_status(self, status_text, color="red"):
+        """Update connection status indicator"""
+        self.status_var.set(status_text)
+        self.header_canvas.itemconfig(self.status_text, text=status_text)
+        
+        if color == "green":
+            fill_color = self.accent_tertiary
+        elif color == "orange":
+            fill_color = "#FFA500"
+        else:
+            fill_color = self.accent_secondary
+            
+        self.header_canvas.itemconfig(self.connection_indicator, fill=fill_color)
+    
+    def update_apps_list(self):
+        """Update applications list with current windows"""
+        # Clear existing app cards
+        for widget in self.apps_container.winfo_children():
+            widget.destroy()
+        
+        # Create cards for each app
+        for i, window in enumerate(self.windows_list):
+            # Create app card
+            card = tk.Frame(self.apps_container, bg=self.panel_bg)
+            card.pack(fill=tk.X, pady=5)
+            
+            # Add circular icon
+            icon_canvas = tk.Canvas(card, width=40, height=40, 
+                                   bg=self.panel_bg, highlightthickness=0)
+            icon_canvas.pack(side=tk.LEFT, padx=10)
+            
+            # Determine icon color based on app type
+            if "chrome" in window["process"].lower():
+                icon_color = "#4285F4"  # Google blue
+            elif "java" in window["process"].lower():
+                icon_color = "#00C853"  # Minecraft green
+            elif "discord" in window["process"].lower():
+                icon_color = "#7289DA"  # Discord purple
+            else:
+                icon_color = self.accent_primary
+            
+            # Draw icon
+            icon_canvas.create_oval(5, 5, 35, 35, fill=icon_color, outline="")
+            
+            # Add app info
+            info_frame = tk.Frame(card, bg=self.panel_bg)
+            info_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=10)
+            
+            # App title
+            title_label = tk.Label(info_frame, text=window["title"],
+                                 font=self.normal_font, bg=self.panel_bg,
+                                 fg=self.text_color, anchor="w", justify=tk.LEFT)
+            title_label.pack(fill=tk.X, anchor="w")
+            
+            # Process name
+            process_label = tk.Label(info_frame, text=window["process"],
+                                  font=self.small_font, bg=self.panel_bg,
+                                  fg=self.secondary_text, anchor="w", justify=tk.LEFT)
+            process_label.pack(fill=tk.X, anchor="w")
+            
+            # View button
+            view_button = ttk.Button(card, text="View", style="Accent.TButton",
+                                   command=lambda wid=window["id"]: self.view_application(wid))
+            view_button.pack(side=tk.RIGHT, padx=10)
+    
+    def update_history_list(self):
+        """Update browser history list"""
+        # Clear existing entries
+        for item in self.history_tree.get_children():
+            self.history_tree.delete(item)
+        
+        # Insert new history data
+        for entry in self.browser_history:
+            # Check if entry matches suspicious patterns
+            is_suspicious = any(pattern.lower() in entry["url"].lower() or 
+                              pattern.lower() in entry["title"].lower() 
+                              for pattern in self.highlight_suspicious_patterns)
+            
+            # Insert with appropriate tag
+            if is_suspicious:
+                self.history_tree.insert('', tk.END, values=(
+                    entry["time"], entry["title"], entry["url"]), tags=('suspicious',))
+            else:
+                self.history_tree.insert('', tk.END, values=(
+                    entry["time"], entry["title"], entry["url"]))
+    
+    def switch_tab(self, tab_name):
+        """Switch between apps and history tabs"""
+        if tab_name == "apps":
+            # Show apps tab
+            self.apps_canvas.itemconfigure(self.apps_container_window, state="normal")
+            self.apps_canvas.itemconfigure(self.history_container_window, state="hidden")
+            
+            # Update tab styling
+            self.apps_canvas.itemconfigure(
+                self.apps_canvas.create_text(
+                    self.apps_panel_width // 4, 25,
+                    text="APPLICATIONS", font=self.subtitle_font, fill="white"),
+                state="normal")
+            
+            self.apps_canvas.itemconfigure(
+                self.apps_canvas.create_text(
+                    self.apps_panel_width // 4 * 3, 25,
+                    text="HISTORY", font=self.normal_font, fill=self.secondary_text),
+                state="normal")
+            
+        elif tab_name == "history":
+            # Show history tab
+            self.apps_canvas.itemconfigure(self.apps_container_window, state="hidden")
+            self.apps_canvas.itemconfigure(self.history_container_window, state="normal")
+            
+            # Update tab styling
+            self.apps_canvas.itemconfigure(
+                self.apps_canvas.create_text(
+                    self.apps_panel_width // 4, 25,
+                    text="APPLICATIONS", font=self.normal_font, fill=self.secondary_text),
+                state="normal")
+            
+            self.apps_canvas.itemconfigure(
+                self.apps_canvas.create_text(
+                    self.apps_panel_width // 4 * 3, 25,
+                    text="HISTORY", font=self.subtitle_font, fill="white"),
+                state="normal")
+    
+    def view_application(self, window_id):
+        """Request view of specific application"""
+        if self.server_running and self.client_socket:
+            # Send view command to client
+            try:
+                command = {"command": "view_window", "window_id": window_id}
+                self.client_socket.send(pickle.dumps(command))
+                
+                # Update active window ID
+                self.active_window_id = window_id
+                window_title = "Unknown"
+                
+                # Find window title
+                for window in self.windows_list:
+                    if window["id"] == window_id:
+                        window_title = window["title"]
+                        break
+                
+                # Update current view label
+                self.view_label_text = f"Current View: {window_title}"
+                self.screen_canvas.itemconfig(self.view_label, text=self.view_label_text)
+                
+            except Exception as e:
+                print(f"Error sending view command: {e}")
+        else:
+            # Update with sample data for demo
+            self.active_window_id = window_id
+            
+            # Find window title
+            window_title = "Unknown"
+            for window in self.windows_list:
+                if window["id"] == window_id:
+                    window_title = window["title"]
+                    break
+            
+            # Update current view label
+            self.view_label_text = f"Current View: {window_title}"
+            self.screen_canvas.itemconfig(self.view_label, text=self.view_label_text)
+    
+    def pause_screen(self):
+        """Pause or resume screen updates"""
+        self.screen_paused = not self.screen_paused
+        
+        if self.server_running and self.client_socket:
+            # Send pause command to client
+            try:
+                command = {"command": "pause_screen", "paused": self.screen_paused}
+                self.client_socket.send(pickle.dumps(command))
+            except Exception as e:
+                print(f"Error sending pause command: {e}")
+    
+    def request_windows_list(self):
+        """Request list of open windows from client"""
+        if self.server_running and self.client_socket:
+            # Send request command to client
+            try:
+                command = {"command": "get_windows"}
+                self.client_socket.send(pickle.dumps(command))
+            except Exception as e:
+                print(f"Error sending windows request: {e}")
+        else:
+            # Use sample data for demo
+            self.windows_list = list(self.sample_windows.values())
+            self.update_apps_list()
+    
+    def request_browser_history(self):
+        """Request browser history from client"""
+        if self.server_running and self.client_socket:
+            # Send request command to client
+            try:
+                command = {"command": "get_history"}
+                self.client_socket.send(pickle.dumps(command))
+            except Exception as e:
+                print(f"Error sending history request: {e}")
+        else:
+            # Use sample data for demo
+            self.browser_history = self.sample_history
+            self.update_history_list()
+            self.switch_tab("history")
+    
+    def start_server(self):
+        """Start monitoring server"""
+        if not self.server_running:
+            # Start server in a separate thread
+            server_thread = threading.Thread(target=self.run_server)
+            server_thread.daemon = True
+            server_thread.start()
+            
+            # Update status
+            self.server_running = True
+            self.update_status("Server started, waiting for connection...", "orange")
     
     def stop_server(self):
-        self.server_running = False
-        if self.client_socket:
-            self.client_socket.close()
-        if self.server_socket:
-            self.server_socket.close()
+        """Stop monitoring server"""
+        if self.server_running:
+            # Close client connection if exists
+            if self.client_socket:
+                try:
+                    command = {"command": "disconnect"}
+                    self.client_socket.send(pickle.dumps(command))
+                    self.client_socket.close()
+                except:
+                    pass
+                finally:
+                    self.client_socket = None
             
-        # Update UI
-        self.status_var.set("Disconnected")
-        self.connection_indicator.itemconfig("indicator", fill=self.warning_color)  # Red for disconnected
-        self.connect_button.config(state=tk.NORMAL)
-        self.disconnect_button.config(state=tk.DISABLED)
-        
+            # Close server socket
+            if self.server_socket:
+                try:
+                    self.server_socket.close()
+                except:
+                    pass
+                finally:
+                    self.server_socket = None
+            
+            # Update status
+            self.server_running = False
+            self.update_status("Disconnected", "red")
+    
     def run_server(self):
+        """Run monitoring server in a separate thread"""
         try:
+            # Create server socket
             self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.server_socket.bind((self.server_ip, self.server_port))
             self.server_socket.listen(1)
-            self.server_socket.settimeout(1.0)  # Add timeout for accept
             
-            while self.server_running:
-                try:
-                    self.client_socket, addr = self.server_socket.accept()
-                    
-                    # Update UI from main thread
-                    self.root.after(0, lambda: self.update_connection_status(f"Connected to {addr[0]}"))
-                    
-                    # Start receiving data
-                    self.receive_thread = threading.Thread(target=self.receive_data)
-                    self.receive_thread.daemon = True
-                    self.receive_thread.start()
-                    
-                    # Request windows list immediately
-                    self.root.after(1000, self.request_windows_list)
-                    
-                except socket.timeout:
-                    continue
-                except Exception as e:
-                    if self.server_running:
-                        self.root.after(0, lambda: self.update_connection_status(f"Connection error: {str(e)}"))
-                    break
-                    
+            print(f"Server started on {self.server_ip}:{self.server_port}")
+            
+            # Update status on UI thread
+            self.root.after(0, lambda: self.update_status("Waiting for connection...", "orange"))
+            
+            # Accept client connection
+            self.client_socket, addr = self.server_socket.accept()
+            
+            print(f"Connection from {addr}")
+            
+            # Update status on UI thread
+            self.root.after(0, lambda: self.update_status(f"Connected to {addr[0]}", "green"))
+            
+            # Start receiving data
+            self.receive_data()
+            
         except Exception as e:
-            self.root.after(0, lambda: self.update_connection_status(f"Server error: {str(e)}"))
-        finally:
-            if self.server_socket:
-                self.server_socket.close()
+            print(f"Server error: {e}")
+            # Update status on UI thread
+            self.root.after(0, lambda: self.update_status("Server error", "red"))
             self.server_running = False
-            self.root.after(0, lambda: self.connect_button.config(state=tk.NORMAL))
-            self.root.after(0, lambda: self.disconnect_button.config(state=tk.DISABLED))
-    
-    def update_connection_status(self, status_text):
-        self.status_var.set(status_text)
-        if "Connected" in status_text:
-            self.connection_indicator.itemconfig("indicator", fill=self.success_color)  # Cyan for connected
-        elif "error" in status_text:
-            self.connection_indicator.itemconfig("indicator", fill=self.warning_color)  # Red for error
     
     def receive_data(self):
+        """Receive and process data from client"""
+        buffer_size = 4096
+        data = b""
+        
         while self.server_running and self.client_socket:
             try:
-                # Read message type (1 byte)
-                msg_type = self.client_socket.recv(1)
-                if not msg_type:
+                # Receive chunk of data
+                chunk = self.client_socket.recv(buffer_size)
+                
+                if not chunk:
+                    # Connection closed
                     break
                 
-                # Read data size (8 bytes)
-                data_size_bytes = self.client_socket.recv(8)
-                if not data_size_bytes:
-                    break
+                # Add chunk to buffer
+                data += chunk
                 
-                data_size = int.from_bytes(data_size_bytes, byteorder='big')
-                
-                # Read the actual data
-                data = b""
-                while len(data) < data_size:
-                    chunk = self.client_socket.recv(min(4096, data_size - len(data)))
-                    if not chunk:
-                        break
-                    data += chunk
-                
-                # Process the data based on message type
-                if msg_type == b'\x01':  # Screen capture
-                    self.process_screen_capture(data)
-                elif msg_type == b'\x02':  # Windows list
-                    self.process_windows_list(data)
-                elif msg_type == b'\x03':  # Browser history
-                    self.process_browser_history(data)
+                # Try to unpickle the data
+                try:
+                    # Check if we have complete data
+                    obj = pickle.loads(data)
+                    
+                    # Process received object
+                    self.process_received_data(obj)
+                    
+                    # Reset buffer
+                    data = b""
+                    
+                except pickle.UnpicklingError:
+                    # Incomplete data, continue receiving
+                    pass
                 
             except Exception as e:
-                if self.server_running:
-                    self.root.after(0, lambda: self.update_connection_status(f"Error receiving data: {str(e)}"))
+                print(f"Error receiving data: {e}")
                 break
         
-        # Connection closed
-        self.root.after(0, lambda: self.update_connection_status("Disconnected"))
+        # Connection closed or error occurred
         if self.client_socket:
             self.client_socket.close()
             self.client_socket = None
-    
-    def process_screen_capture(self, data):
-        try:
-            # Convert the data to an image and display it
-            image = Image.open(io.BytesIO(data))
-            
-            # Resize image to fit the label if needed
-            label_width = self.screen_label.winfo_width()
-            label_height = self.screen_label.winfo_height()
-            
-            if label_width > 1 and label_height > 1:
-                image = image.resize((label_width, label_height), Image.LANCZOS)
-            
-            photo = ImageTk.PhotoImage(image)
-            
-            # Update the UI from the main thread
-            self.root.after(0, lambda: self.update_screen_display(photo))
-                
-        except Exception as e:
-            if self.server_running:
-                self.root.after(0, lambda: self.update_connection_status(f"Error processing screen: {str(e)}"))
-    
-    def update_screen_display(self, photo):
-        self.screen_label.config(image=photo)
-        self.screen_label.image = photo  # Keep a reference
-    
-    def process_windows_list(self, data):
-        try:
-            # Deserialize the windows list
-            windows_data = pickle.loads(data)
-            
-            # Update the UI from the main thread
-            self.root.after(0, lambda: self.update_windows_list(windows_data))
-                
-        except Exception as e:
-            if self.server_running:
-                self.root.after(0, lambda: self.update_connection_status(f"Error processing apps list: {str(e)}"))
-    
-    def process_browser_history(self, data):
-        try:
-            # Deserialize the browser history
-            history_data = pickle.loads(data)
-            
-            # Update the UI from the main thread
-            self.root.after(0, lambda: self.update_browser_history(history_data))
-                
-        except Exception as e:
-            if self.server_running:
-                self.root.after(0, lambda: self.update_connection_status(f"Error processing browser history: {str(e)}"))
-    
-    def update_windows_list(self, windows_data):
-        # Clear existing windows list
-        self.clear_windows_list()
         
-        # Create a new window button for each window
-        for window_id, window_info in windows_data.items():
-            window_title = window_info['title']
-            window_process = window_info['process']
-            
-            # Create a app card frame
-            card_frame = tk.Frame(self.windows_container, bg=self.highlight_color, bd=1, relief=tk.SOLID)
-            card_frame.pack(fill=tk.X, padx=5, pady=5, ipady=5)
-            
-            # Create app icon frame
-            icon_color = self.get_icon_color(window_process)
-            icon_frame = tk.Frame(card_frame, bg=icon_color, width=40, height=40)
-            icon_frame.pack(side=tk.LEFT, padx=10, pady=10)
-            icon_frame.pack_propagate(False)
-            
-            # App icon text (first letter of process)
-            icon_text = window_process[0].upper() if window_process else "?"
-            icon_label = tk.Label(icon_frame, text=icon_text, 
-                                font=("Segoe UI", 16, "bold"), bg=icon_color, fg="white")
-            icon_label.pack(fill=tk.BOTH, expand=True)
-            
-            # App info frame
-            info_frame = tk.Frame(card_frame, bg=self.highlight_color)
-            info_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10), pady=10)
-            
-            # App title
-            title_label = tk.Label(info_frame, text=window_title, bg=self.highlight_color, 
-                                 fg=self.text_color, font=self.normal_font, anchor=tk.W,
-                                 justify=tk.LEFT)
-            title_label.pack(fill=tk.X, anchor=tk.W)
-            
-            # App process name
-            process_label = tk.Label(info_frame, text=window_process, bg=self.highlight_color,
-                                   fg=self.secondary_color, font=self.small_font, anchor=tk.W,
-                                   justify=tk.LEFT)
-            process_label.pack(fill=tk.X, anchor=tk.W)
-            
-            # Store window information
-            self.windows_list.append((window_id, card_frame))
-            
-            # Make the entire card clickable
-            card_frame.bind("<Button-1>", lambda e, wid=window_id: self.select_window(wid))
-            card_frame.bind("<Enter>", lambda e, frame=card_frame: self.on_hover_enter(frame))
-            card_frame.bind("<Leave>", lambda e, frame=card_frame, wid=window_id: self.on_hover_leave(frame, wid))
-            
-            # Make all child widgets clickable too
-            for child in card_frame.winfo_children():
-                child.bind("<Button-1>", lambda e, wid=window_id: self.select_window(wid))
-                child.bind("<Enter>", lambda e, frame=card_frame: self.on_hover_enter(frame))
-                child.bind("<Leave>", lambda e, frame=card_frame, wid=window_id: self.on_hover_leave(frame, wid))
-                
-                if isinstance(child, tk.Frame):
-                    for grandchild in child.winfo_children():
-                        grandchild.bind("<Button-1>", lambda e, wid=window_id: self.select_window(wid))
-                        grandchild.bind("<Enter>", lambda e, frame=card_frame: self.on_hover_enter(frame))
-                        grandchild.bind("<Leave>", lambda e, frame=card_frame, wid=window_id: self.on_hover_leave(frame, wid))
-            
-            # Highlight active window if any
-            if self.active_window_id == window_id:
-                self.highlight
-                self.highlight_active_window(card_frame, True)
-    
-    def clear_windows_list(self):
-        # Clear all widgets from windows container
-        for child in self.windows_container.winfo_children():
-            child.destroy()
-        self.windows_list = []
-    
-    def get_icon_color(self, process_name):
-        # Get a deterministic color based on process name
-        process_name = process_name.lower()
+        # Update status on UI thread
+        self.root.after(0, lambda: self.update_status("Disconnected", "red"))
         
-        # Predefined colors for common applications
-        colors = {
-            "chrome": "#4285F4",  # Google blue
-            "firefox": "#FF9400",  # Firefox orange
-            "explorer": "#0078D7",  # Windows blue
-            "discord": "#7289DA",  # Discord purple
-            "javaw": "#5cb85c",  # Green for Minecraft
-            "notepad": "#1e88e5",  # Blue for Notepad
-            "msedge": "#0078D7",  # Edge blue
-        }
-        
-        # Check for matches
-        for app, color in colors.items():
-            if app in process_name:
-                return color
-        
-        # Generate a color based on the first letter
-        if process_name:
-            hash_value = hash(process_name[0].lower())
-            # Generate colors in a nice range (avoid too light or too dark)
-            r = (hash_value & 0xFF) % 128 + 64
-            g = ((hash_value >> 8) & 0xFF) % 128 + 64
-            b = ((hash_value >> 16) & 0xFF) % 128 + 64
-            return f"#{r:02x}{g:02x}{b:02x}"
-        
-        return self.accent_color  # Default fallback
+        print("Connection closed")
     
-    def select_window(self, window_id):
-        # Handle window selection
-        self.active_window_id = window_id
-        
-        # Update all window frames to remove highlights from others
-        for wid, frame in self.windows_list:
-            if wid == window_id:
-                self.highlight_active_window(frame, True)
+    def process_received_data(self, data):
+        """Process received data from client"""
+        # Check data type
+        if isinstance(data, dict):
+            # Command response
+            if "type" in data:
+                data_type = data["type"]
                 
-                # Request screenshot for the selected window
-                self.request_window_screenshot(window_id)
-                
-                # Update current view label
-                for w_id, info in self.sample_windows.items():
-                    if w_id == window_id:
-                        self.view_label.config(text=f"Current View: {info['title']}")
-                        break
-            else:
-                self.highlight_active_window(frame, False)
+                if data_type == "screenshot":
+                    # Process screenshot
+                    self.update_screenshot(data["data"])
+                    
+                elif data_type == "windows_list":
+                    # Process windows list
+                    self.windows_list = data["data"]
+                    # Update UI on main thread
+                    self.root.after(0, self.update_apps_list)
+                    
+                elif data_type == "browser_history":
+                    # Process browser history
+                    self.browser_history = data["data"]
+                    # Update UI on main thread
+                    self.root.after(0, self.update_history_list)
+                    # Switch to history tab
+                    self.root.after(0, lambda: self.switch_tab("history"))
     
-    def highlight_active_window(self, frame, is_active):
-        # Highlight the active window
-        if is_active:
-            frame.config(bg=self.accent_color)
-            for child in frame.winfo_children():
-                if isinstance(child, tk.Frame) and not child.winfo_children()[0].cget("text").isalpha():
-                    # Skip the icon frame
-                    continue
-                child.config(bg=self.accent_color)
-                
-                for grandchild in child.winfo_children():
-                    if isinstance(grandchild, tk.Label):
-                        grandchild.config(bg=self.accent_color)
-        else:
-            frame.config(bg=self.highlight_color)
-            for child in frame.winfo_children():
-                if isinstance(child, tk.Frame) and child.winfo_children() and not child.winfo_children()[0].cget("text").isalpha():
-                    # Skip the icon frame
-                    continue
-                child.config(bg=self.highlight_color)
-                
-                for grandchild in child.winfo_children():
-                    if isinstance(grandchild, tk.Label):
-                        grandchild.config(bg=self.highlight_color)
-    
-    def on_hover_enter(self, frame):
-        # Highlight on hover
-        if self.active_window_id is None or frame not in [f for _, f in self.windows_list if _ == self.active_window_id]:
-            frame.config(bg="#3E3E7E")  # Slightly lighter than highlight color
-            for child in frame.winfo_children():
-                if isinstance(child, tk.Frame) and child.winfo_children() and not child.winfo_children()[0].cget("text").isalpha():
-                    # Skip the icon frame
-                    continue
-                child.config(bg="#3E3E7E")
-                
-                for grandchild in child.winfo_children():
-                    if isinstance(grandchild, tk.Label):
-                        grandchild.config(bg="#3E3E7E")
-    
-    def on_hover_leave(self, frame, window_id):
-        # Remove highlight on mouse leave, but keep for active window
-        if window_id != self.active_window_id:
-            frame.config(bg=self.highlight_color)
-            for child in frame.winfo_children():
-                if isinstance(child, tk.Frame) and child.winfo_children() and not child.winfo_children()[0].cget("text").isalpha():
-                    # Skip the icon frame
-                    continue
-                child.config(bg=self.highlight_color)
-                
-                for grandchild in child.winfo_children():
-                    if isinstance(grandchild, tk.Label):
-                        grandchild.config(bg=self.highlight_color)
-    
-    def update_browser_history(self, history_data):
-        # Clear current history
-        for item in self.history_tree.get_children():
-            self.history_tree.delete(item)
-        
-        # Add new history items
-        for item in history_data:
-            # Check if the entry contains suspicious terms
-            is_suspicious = False
-            for pattern in self.highlight_suspicious_patterns:
-                if pattern.lower() in item['url'].lower() or pattern.lower() in item['title'].lower():
-                    is_suspicious = True
-                    break
-            
-            item_id = self.history_tree.insert('', tk.END, values=(item['time'], item['title'], item['url']))
-            
-            # Highlight suspicious entries
-            if is_suspicious:
-                self.history_tree.item(item_id, tags=('suspicious',))
-        
-        # Configure tag appearance
-        self.history_tree.tag_configure('suspicious', background=self.warning_color, foreground='white')
-    
-    def request_windows_list(self):
-        if self.client_socket and self.server_running:
+    def update_screenshot(self, screenshot_data):
+        """Update screenshot on UI"""
+        if not self.screen_paused:
             try:
-                # Send request for windows list (message type 0x02)
-                request = b'\x02' + (0).to_bytes(8, byteorder='big')
-                self.client_socket.sendall(request)
-            except:
-                # If not connected to client, use sample data
-                self.update_windows_list(self.sample_windows)
-        else:
-            # If not connected to client, use sample data
-            self.update_windows_list(self.sample_windows)
-    
-    def request_window_screenshot(self, window_id):
-        if self.client_socket and self.server_running:
-            try:
-                # Send request for specific window screenshot (message type 0x01)
-                request = b'\x01' + window_id.to_bytes(8, byteorder='big')
-                self.client_socket.sendall(request)
+                # Convert bytes to image
+                screen_bytes = io.BytesIO(screenshot_data)
+                screen_img = Image.open(screen_bytes)
+                
+                # Resize to fit screen area
+                width = int(self.screen_area[2] - self.screen_area[0])
+                height = int(self.screen_area[3] - self.screen_area[1])
+                screen_img = screen_img.resize((width, height), Image.LANCZOS)
+                
+                # Convert to PhotoImage
+                self.screen_photo = ImageTk.PhotoImage(screen_img)
+                
+                # Update canvas item
+                if self.screen_item:
+                    self.screen_canvas.itemconfig(self.screen_item, image=self.screen_photo)
+                else:
+                    self.screen_item = self.screen_canvas.create_image(
+                        self.screen_area[0], self.screen_area[1], 
+                        image=self.screen_photo, anchor="nw")
+            
             except Exception as e:
-                self.update_connection_status(f"Error requesting screenshot: {str(e)}")
-    
-    def request_browser_history(self):
-        if self.client_socket and self.server_running:
-            try:
-                # Send request for browser history (message type 0x03)
-                request = b'\x03' + (0).to_bytes(8, byteorder='big')
-                self.client_socket.sendall(request)
-            except:
-                # If not connected to client, use sample data
-                self.update_browser_history(self.sample_history)
-        else:
-            # If not connected to client, use sample data
-            self.update_browser_history(self.sample_history)
-    
-    def pause_screen(self):
-        self.screen_paused = not self.screen_paused
-        if self.screen_paused:
-            self.pause_button.config(text="Resume Screen")
-        else:
-            self.pause_button.config(text="Pause Screen")
-            # Request current window again if not paused
-            if self.active_window_id is not None:
-                self.request_window_screenshot(self.active_window_id)
+                print(f"Error updating screenshot: {e}")
 
-def main():
-    root = tk.Tk()
-    app = ModernParentMonitorApp(root)
-    root.mainloop()
+# Add custom shape function to Canvas class
+tk.Canvas.create_rounded_rectangle = lambda self, x1, y1, x2, y2, radius=25, **kwargs: self.create_polygon(
+    x1+radius, y1,
+    x2-radius, y1,
+    x2, y1,
+    x2, y1+radius,
+    x2, y2-radius,
+    x2, y2,
+    x2-radius, y2,
+    x1+radius, y2,
+    x1, y2,
+    x1, y2-radius,
+    x1, y1+radius,
+    x1, y1,
+    smooth=True, **kwargs)
 
 if __name__ == "__main__":
-    main()
+    root = tk.Tk()
+    app = FuturisticParentMonitorApp(root)
+    root.mainloop()
+    if_name_=="_main_": main()

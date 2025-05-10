@@ -18,24 +18,33 @@ class FuturisticParentMonitorApp:
         self.root.title("GUARDIAN - Advanced Monitoring System")
         self.root.geometry("1280x800")
         
-        # Set futuristic theme and colors - 2040 style
-        self.bg_color = "#0B0B1E"  # Deep space background
-        self.secondary_bg = "#1A1A3A"  # Slightly lighter background
-        self.accent_primary = "#4361EE"  # Bright blue accent
-        self.accent_secondary = "#F72585"  # Neon pink accent
-        self.accent_tertiary = "#4CC9F0"  # Cyan accent
-        self.accent_quaternary = "#7209B7"  # Deep purple accent
-        self.text_color = "#FFFFFF"  # White text
-        self.secondary_text = "#A0A0C0"  # Light purple/gray text
-        self.panel_bg = "#202045"  # Panel background
-        self.highlight_color = "#2E2E5A"  # Highlight color
+        # Set refined professional theme and colors
+        self.bg_color = "#0F1A2B"  # Deep navy background
+        self.secondary_bg = "#162A45"  # Slightly lighter background
+        self.accent_primary = "#3A7BDB"  # Professional blue accent
+        self.accent_secondary = "#E63E6D"  # Professional rose accent
+        self.accent_tertiary = "#39B0CA"  # Professional teal accent
+        self.accent_quaternary = "#5D3E8D"  # Professional purple accent
+        self.text_color = "#F0F4F9"  # Soft white text
+        self.secondary_text = "#A1B4CE"  # Light blue/gray text
+        self.panel_bg = "#1C3048"  # Panel background
+        self.highlight_color = "#2A4365"  # Highlight color
         
-        # Custom fonts
-        self.title_font = tkfont.Font(family="Segoe UI", size=18, weight="bold")
-        self.subtitle_font = tkfont.Font(family="Segoe UI", size=14, weight="bold")
-        self.normal_font = tkfont.Font(family="Segoe UI", size=12)
-        self.small_font = tkfont.Font(family="Segoe UI", size=10)
-        self.button_font = tkfont.Font(family="Segoe UI", size=11, weight="bold")
+        # Custom fonts - more professional
+        try:
+            # Try to use professional system fonts if available
+            self.title_font = tkfont.Font(family="Segoe UI", size=16, weight="bold")
+            self.subtitle_font = tkfont.Font(family="Segoe UI", size=12, weight="bold")
+            self.normal_font = tkfont.Font(family="Segoe UI", size=10)
+            self.small_font = tkfont.Font(family="Segoe UI", size=9)
+            self.button_font = tkfont.Font(family="Segoe UI", size=10, weight="bold")
+        except:
+            # Fall back to system default
+            self.title_font = tkfont.Font(size=16, weight="bold")
+            self.subtitle_font = tkfont.Font(size=12, weight="bold")
+            self.normal_font = tkfont.Font(size=10)
+            self.small_font = tkfont.Font(size=9)
+            self.button_font = tkfont.Font(size=10, weight="bold")
         
         # Create custom styles for ttk widgets
         self.configure_styles()
@@ -101,84 +110,94 @@ class FuturisticParentMonitorApp:
         self.root.after(100, self.load_sample_data)
         
     def configure_styles(self):
-        """Configure custom styles for ttk widgets"""
+        """Configure custom styles with professional appearance"""
         style = ttk.Style()
         style.theme_use('clam')
         
-        # Configure button styles
+        # Configure button styles - more professional
         style.configure("Accent.TButton", 
                         font=self.button_font, 
                         background=self.accent_primary, 
                         foreground="white",
-                        padding=(15, 8))
+                        padding=(12, 6))  # More balanced padding
+        
+        style.map("Accent.TButton",
+                background=[('active', self.highlight_color)],
+                relief=[('pressed', 'sunken')])
         
         style.configure("Warning.TButton", 
                         font=self.button_font, 
                         background=self.accent_secondary,
                         foreground="white",
-                        padding=(15, 8))
+                        padding=(12, 6))
         
         style.configure("Success.TButton", 
                         font=self.button_font, 
                         background=self.accent_tertiary,
                         foreground="white",
-                        padding=(15, 8))
+                        padding=(12, 6))
         
-        # Configure treeview styles
+        # Configure treeview styles - more professional
         style.configure("Treeview", 
                         background=self.panel_bg,
                         foreground=self.text_color,
                         fieldbackground=self.panel_bg,
                         borderwidth=0)
         
+        style.map("Treeview",
+                background=[('selected', self.highlight_color)],
+                foreground=[('selected', self.text_color)])
+        
         style.configure("Treeview.Heading", 
                         background=self.highlight_color,
                         foreground=self.text_color,
+                        relief="flat",
                         font=self.normal_font)
         
-        # Configure entry styles
+        # Configure entry styles - more professional
         style.configure("TEntry", 
                         background=self.panel_bg,
                         foreground=self.text_color,
                         fieldbackground=self.panel_bg,
-                        insertcolor=self.text_color)
+                        insertcolor=self.text_color,
+                        borderwidth=1)
     
     def create_gradient_background(self):
-        """Create a gradient background with animated particles"""
+        """Create a refined gradient background with subtle grid"""
         # Create gradient background
         width, height = 1280, 800
         self.bg_image = Image.new('RGBA', (width, height), self.bg_color)
         draw = ImageDraw.Draw(self.bg_image)
         
-        # Create radial gradient
+        # Create subtle radial gradient
         for i in range(width + height):
-            # Draw radial gradient from top-left and bottom-right
-            alpha = int(255 - i * 0.1) if i * 0.1 < 255 else 0
+            # More subtle gradient
+            alpha = int(200 - i * 0.08) if i * 0.08 < 200 else 0
             if alpha > 0:
                 draw.ellipse((0 - i, 0 - i, i, i), 
-                             fill=(67, 97, 238, alpha//10))
+                            fill=(58, 123, 213, alpha//12))  # More subtle blue
                 draw.ellipse((width - i, height - i, width + i, height + i), 
-                             fill=(247, 37, 133, alpha//10))
+                            fill=(93, 62, 141, alpha//12))   # More subtle purple
         
-        # Add some noise texture
-        for _ in range(1000):
+        # Add refined noise texture (less dense)
+        for _ in range(500):  # Reduced from 1000
             x = random.randint(0, width - 1)
             y = random.randint(0, height - 1)
-            alpha = random.randint(5, 30)
+            alpha = random.randint(3, 15)  # More subtle particles
             draw.point((x, y), fill=(255, 255, 255, alpha))
         
         # Apply slight blur
-        self.bg_image = self.bg_image.filter(ImageFilter.GaussianBlur(radius=20))
+        self.bg_image = self.bg_image.filter(ImageFilter.GaussianBlur(radius=15))
         
         # Convert to PhotoImage and display
         self.bg_photo = ImageTk.PhotoImage(self.bg_image)
         self.canvas.create_image(0, 0, image=self.bg_photo, anchor="nw")
         
-        # Add decorative grid lines
+        # Add professional grid lines (thinner, more subtle)
         for i in range(0, width, 100):
-            self.canvas.create_line(i, 0, i, height, fill=f"#{30:02x}{30:02x}{60:02x}", width=1)
+            self.canvas.create_line(i, 0, i, height, fill=f"#{40:02x}{50:02x}{80:02x}", width=0.5)
         for i in range(0, height, 100):
-            self.canvas.create_line(0, i, width, i, fill=f"#{30:02x}{30:02x}{60:02x}", width=1)
+            self.canvas.create_line(0, i, width, i, fill=f"#{40:02x}{50:02x}{80:02x}", width=0.5)
     
     def create_header(self):
         """Create futuristic curved header bar"""
@@ -240,20 +259,20 @@ class FuturisticParentMonitorApp:
         
         # Draw gradient
         for i in range(width):
-            # Calculate gradient color
-            r = int(67 + (67 - 48) * i / width)
-            g = int(97 + (97 - 55) * i / width)
-            b = int(238 + (238 - 200) * i / width)
+            # Calculate gradient color - more professional
+            r = int(58 + (58 - 45) * i / width)
+            g = int(123 + (123 - 90) * i / width)
+            b = int(219 + (219 - 180) * i / width)
             draw.line([(i, 0), (i, height)], fill=(r, g, b))
         
         # Apply curve at the bottom
         mask = Image.new('L', (width, height), 0)
         mask_draw = ImageDraw.Draw(mask)
         
-        # Draw curve
+        # Draw curve - more subtle
         mask_draw.rectangle((0, 0, width, height - 20), fill=255)
         for x in range(width):
-            y_offset = int(10 * math.sin(math.pi * x / width))
+            y_offset = int(8 * math.sin(math.pi * x / width))  # Less dramatic curve
             mask_draw.rectangle((x, height - 20, x + 1, height - 20 + y_offset), fill=255)
         
         # Apply mask
@@ -307,12 +326,12 @@ class FuturisticParentMonitorApp:
                                      fill="white", 
                                      anchor="w")
         
-        # Add control dots
-        self.screen_canvas.create_oval(self.screen_width - 150, 35, self.screen_width - 140, 45, 
+        # Add control dots - smaller, more refined
+        self.screen_canvas.create_oval(self.screen_width - 150, 35, self.screen_width - 142, 43, 
                                      fill=self.accent_tertiary, outline="")
-        self.screen_canvas.create_oval(self.screen_width - 130, 35, self.screen_width - 120, 45, 
+        self.screen_canvas.create_oval(self.screen_width - 130, 35, self.screen_width - 122, 43, 
                                      fill=self.accent_secondary, outline="")
-        self.screen_canvas.create_oval(self.screen_width - 110, 35, self.screen_width - 100, 45, 
+        self.screen_canvas.create_oval(self.screen_width - 110, 35, self.screen_width - 102, 43, 
                                      fill=self.accent_primary, outline="")
         
         # Current window info at bottom
@@ -327,66 +346,74 @@ class FuturisticParentMonitorApp:
         self.draw_activity_meter()
     
     def draw_activity_meter(self):
-        """Draw activity meter in the screen panel"""
-        # Background
+        """Draw activity meter with professional styling"""
+        # Background - more subtle rounded corners
         self.screen_canvas.create_rounded_rectangle(
             self.screen_width - 200, self.screen_height - 38,
             self.screen_width - 50, self.screen_height - 22,
-            radius=8, fill=self.secondary_bg, outline="")
+            radius=4, fill=self.secondary_bg, outline=self.highlight_color)
         
-        # Active part (will be updated)
+        # Active part (will be updated) - professional gradient
         self.activity_meter = self.screen_canvas.create_rounded_rectangle(
             self.screen_width - 200, self.screen_height - 38,
             self.screen_width - 120, self.screen_height - 22,
-            radius=8, fill=self.accent_secondary, outline="")
+            radius=4, fill=self.accent_tertiary, outline="")
         
-        # Label
+        # Label - better positioned
         self.screen_canvas.create_text(
             self.screen_width - 125, self.screen_height - 30,
-            text="ACTIVITY", font=self.small_font, fill="white")
+            text="ACTIVITY", font=self.small_font, fill=self.text_color)
     
     def draw_screen_panel(self):
-        """Draw screen panel with curved borders"""
+        """Draw screen panel with professional styling"""
         # Get panel dimensions
         self.screen_width = self.screen_panel.winfo_width() 
-        if self.screen_width < 100:  # Default size if not yet rendered
+        if self.screen_width < 100:
             self.screen_width = 800  
             
         self.screen_height = self.screen_panel.winfo_height()
-        if self.screen_height < 100:  # Default size if not yet rendered
+        if self.screen_height < 100:
             self.screen_height = 600
         
-        # Create rounded panel
+        # Create rounded panel with more subtle corners
         panel_img = Image.new('RGBA', (self.screen_width, self.screen_height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(panel_img)
         
-        # Main panel background
+        # Main panel background - more subtle transparency and refined color
         draw.rounded_rectangle(
             (0, 0, self.screen_width, self.screen_height), 
-            radius=20, 
-            fill=(30, 30, 60, 150))  # Semi-transparent
+            radius=10,  # Reduced from 20 for more professional look
+            fill=(28, 48, 72, 180))
         
-        # Header bar
+        # Header bar - more professional gradient
         draw.rounded_rectangle(
             (0, 0, self.screen_width, 70),
-            radius=20,
-            fill=(67, 97, 238, 255))
+            radius=10,
+            fill=(58, 123, 219, 230))  # More transparent, professional blue
         
-        # Bottom status bar
+        # Bottom status bar - more professional
         draw.rounded_rectangle(
             (0, self.screen_height - 60, self.screen_width, self.screen_height),
-            radius=(0, 0, 20, 20),  # Only round bottom corners
-            fill=(30, 30, 70, 200))
+            radius=(0, 0, 10, 10),  # Only round bottom corners, smaller radius
+            fill=(30, 40, 70, 180))
         
-        # Main screen area
+        # Main screen area - cleaner look
         self.screen_area = (20, 80, self.screen_width - 20, self.screen_height - 70)
         draw.rounded_rectangle(
             self.screen_area,
-            radius=10,
-            fill=(20, 20, 40, 128))  # Semi-transparent
+            radius=6,  # Smaller radius for more professional look
+            fill=(25, 35, 60, 140))  # Slightly more opaque for better contrast
         
-        # Apply slight blur for a modern look
-        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.5))
+        # Apply slight blur for a professional look
+        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.3))  # More subtle blur
+        
+        # Add a subtle border to enhance professionalism
+        draw = ImageDraw.Draw(panel_img)
+        draw.rounded_rectangle(
+            (0, 0, self.screen_width, self.screen_height),
+            radius=10,
+            outline=(100, 140, 200, 40),  # Subtle border
+            width=1)
         
         # Convert to PhotoImage
         self.screen_frame_img = ImageTk.PhotoImage(panel_img)
@@ -436,23 +463,31 @@ class FuturisticParentMonitorApp:
         # Main panel background
         draw.rounded_rectangle(
             (0, 0, apps_width, apps_height), 
-            radius=20, 
-            fill=(30, 30, 60, 150))  # Semi-transparent
+            radius=10,  # More professional radius
+            fill=(28, 48, 72, 180))  # More professional color
         
         # Tab bar
         draw.rounded_rectangle(
             (0, 0, apps_width, 50),
-            radius=(20, 20, 0, 0),  # Only round top corners
-            fill=(20, 20, 40, 230))
+            radius=(10, 10, 0, 0),  # Only round top corners
+            fill=(25, 35, 60, 220))  # Darker, more professional
         
         # Active tab
         draw.rounded_rectangle(
             (0, 0, apps_width // 2, 50),
-            radius=(20, 20, 0, 0),  # Only round top corners
-            fill=(67, 97, 238, 255))
+            radius=(10, 10, 0, 0),  # Only round top corners
+            fill=(58, 123, 219, 230))  # Professional blue
         
         # Apply slight blur for a modern look
-        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.5))
+        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.3))  # More subtle blur
+        
+        # Add subtle border
+        draw = ImageDraw.Draw(panel_img)
+        draw.rounded_rectangle(
+            (0, 0, apps_width, apps_height),
+            radius=10,
+            outline=(100, 140, 200, 40),  # Subtle border
+            width=1)
         
         # Convert to PhotoImage
         self.apps_frame_img = ImageTk.PhotoImage(panel_img)
@@ -487,111 +522,112 @@ class FuturisticParentMonitorApp:
     
     def create_apps_list(self):
         """Create applications list area"""
-        # Search bar
+        # Search bar - more professional
         search_bg = self.apps_canvas.create_rounded_rectangle(
             20, 70, self.apps_panel_width - 20, 110,
-            radius=20, fill=self.panel_bg)
+            radius=6, fill=self.panel_bg)  # Smaller radius
         
-        # Search icon
-        self.apps_canvas.create_oval(35, 90, 45, 100, outline=self.secondary_text, width=2)
-        self.apps_canvas.create_line(43, 98, 50, 105, fill=self.secondary_text, width=2)
+        # Search icon - more refined
+        self.apps_canvas.create_oval(35, 90, 43, 98, outline=self.secondary_text, width=1)
+        self.apps_canvas.create_line(41, 96, 48, 103, fill=self.secondary_text, width=1)
         
         # Search text
-    self.apps_canvas.create_text(
-        60, 90, text="Search applications...",
-        font=self.normal_font, fill=self.secondary_text, anchor="w")
+        self.apps_canvas.create_text(
+            60, 90, text="Search applications...",
+            font=self.normal_font, fill=self.secondary_text, anchor="w")
+        
+        # Container for app cards
+        self.apps_container = tk.Frame(self.apps_canvas, bg=self.panel_bg)
+        self.apps_container_window = self.apps_canvas.create_window(
+            20, 130, window=self.apps_container,
+            anchor="nw", width=self.apps_panel_width - 40, height=420)
+        
+        # Apps container will be populated with cards
     
-    # Container for app cards
-    self.apps_container = tk.Frame(self.apps_canvas, bg=self.panel_bg)
-    self.apps_container_window = self.apps_canvas.create_window(
-        20, 130, window=self.apps_container,
-        anchor="nw", width=self.apps_panel_width - 40, height=420)
+    def create_history_tab(self):
+        """Create history tab content (initially hidden)"""
+        # Container for history tab
+        self.history_container = tk.Frame(self.apps_canvas, bg=self.panel_bg)
+        self.history_container_window = self.apps_canvas.create_window(
+            20, 130, window=self.history_container,
+            anchor="nw", width=self.apps_panel_width - 40, height=420)
+        
+        # Hide initially
+        self.apps_canvas.itemconfigure(self.history_container_window, state="hidden")
+        
+        # Search bar for history
+        self.history_search_frame = tk.Frame(self.history_container, bg=self.panel_bg)
+        self.history_search_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        self.history_search_var = tk.StringVar()
+        self.history_search_entry = ttk.Entry(
+            self.history_search_frame, textvariable=self.history_search_var,
+            font=self.normal_font)
+        self.history_search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        
+        self.history_search_button = ttk.Button(
+            self.history_search_frame, text="Search", style="Accent.TButton")
+        self.history_search_button.pack(side=tk.RIGHT, padx=(10, 0))
+        
+        # Create tree view for history
+        columns = ('time', 'title', 'url')
+        self.history_tree = ttk.Treeview(
+            self.history_container, columns=columns, show='headings', height=15)
+        
+        # Define headings
+        self.history_tree.heading('time', text='Time')
+        self.history_tree.heading('title', text='Page Title')
+        self.history_tree.heading('url', text='URL')
+        
+        # Define columns
+        self.history_tree.column('time', width=70)
+        self.history_tree.column('title', width=150)
+        self.history_tree.column('url', width=120)
+        
+        # Add scrollbar
+        self.history_scrollbar = ttk.Scrollbar(
+            self.history_container, orient=tk.VERTICAL,
+            command=self.history_tree.yview)
+        self.history_tree.configure(yscroll=self.history_scrollbar.set)
+        
+        # Pack elements
+        self.history_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.history_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        # Highlight suspicious searches
+        self.highlight_suspicious_patterns = [
+            'game', 'minecraft', 'cheat', 'play', 'youtube', 'roblox', 'discord']
+        
+        # Configure tag appearance - more professional highlight
+        self.history_tree.tag_configure(
+            'suspicious', background=self.accent_secondary, foreground='white')
     
-    # Apps container will be populated with cards
-
-def create_history_tab(self):
-    """Create history tab content (initially hidden)"""
-    # Container for history tab
-    self.history_container = tk.Frame(self.apps_canvas, bg=self.panel_bg)
-    self.history_container_window = self.apps_canvas.create_window(
-        20, 130, window=self.history_container,
-        anchor="nw", width=self.apps_panel_width - 40, height=420)
-    
-    # Hide initially
-    self.apps_canvas.itemconfigure(self.history_container_window, state="hidden")
-    
-    # Search bar for history
-    self.history_search_frame = tk.Frame(self.history_container, bg=self.panel_bg)
-    self.history_search_frame.pack(fill=tk.X, pady=(0, 10))
-    
-    self.history_search_var = tk.StringVar()
-    self.history_search_entry = ttk.Entry(
-        self.history_search_frame, textvariable=self.history_search_var,
-        font=self.normal_font)
-    self.history_search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
-    
-    self.history_search_button = ttk.Button(
-        self.history_search_frame, text="Search", style="Accent.TButton")
-    self.history_search_button.pack(side=tk.RIGHT, padx=(10, 0))
-    
-    # Create tree view for history
-    columns = ('time', 'title', 'url')
-    self.history_tree = ttk.Treeview(
-        self.history_container, columns=columns, show='headings', height=15)
-    
-    # Define headings
-    self.history_tree.heading('time', text='Time')
-    self.history_tree.heading('title', text='Page Title')
-    self.history_tree.heading('url', text='URL')
-    
-    # Define columns
-    self.history_tree.column('time', width=70)
-    self.history_tree.column('title', width=150)
-    self.history_tree.column('url', width=120)
-    
-    # Add scrollbar
-    self.history_scrollbar = ttk.Scrollbar(
-        self.history_container, orient=tk.VERTICAL,
-        command=self.history_tree.yview)
-    self.history_tree.configure(yscroll=self.history_scrollbar.set)
-    
-    # Pack elements
-    self.history_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-    self.history_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-    
-    # Highlight suspicious searches
-    self.highlight_suspicious_patterns = [
-        'game', 'minecraft', 'cheat', 'play', 'youtube', 'roblox', 'discord']
-    
-    # Configure tag appearance
-    self.history_tree.tag_configure(
-        'suspicious', background=self.accent_secondary, foreground='white')
     def create_analytics_panel(self):
         """Create analytics panel below apps list"""
-        # Analytics panel background
+        # Analytics panel background - more professional
         analytics_bg = self.apps_canvas.create_rounded_rectangle(
             0, 560, self.apps_panel_width, 690,
-            radius=15, fill=(30, 30, 70, 180))
+            radius=8, fill=(28, 48, 72, 180))  # More professional color
         
-        # Header bar
+        # Header bar - more professional
         analytics_header = self.apps_canvas.create_rounded_rectangle(
             0, 560, self.apps_panel_width, 600,
-            radius=(15, 15, 0, 0), fill=self.accent_secondary)
+            radius=(8, 8, 0, 0), fill=self.accent_secondary)
         
         # Title
         self.apps_canvas.create_text(
             20, 580, text="ACTIVITY INSIGHTS",
             font=self.subtitle_font, fill="white", anchor="w")
         
-        # Activity graph background
+        # Activity graph background - more professional
         graph_bg = self.apps_canvas.create_rounded_rectangle(
             20, 620, self.apps_panel_width - 20, 680,
-            radius=10, fill=(20, 20, 40, 128))
+            radius=6, fill=(25, 35, 60, 180))  # More professional
         
         # Draw activity graph
         self.draw_activity_graph()
         
-        # Alert message
+        # Alert message - more professional
         self.apps_canvas.create_text(
             20, 700, text="Gaming activity detected in the last 15 minutes",
             font=self.small_font, fill=self.accent_secondary, anchor="w")
@@ -604,21 +640,22 @@ def create_history_tab(self):
             (180, 620), (210, 635), (240, 610), (270, 600), (300, 620)
         ]
         
-        # Draw connecting line
+        # Draw connecting line - smoother
         self.apps_canvas.create_line(
-            points, fill=self.accent_secondary, width=2, smooth=True)
+            points, fill=self.accent_secondary, width=1.5, smooth=True)  # Thinner, more professional
         
-        # Draw points
+        # Draw points - more professional
         for x, y in points:
-            # Regular points
+            # Regular points - smaller for professional look
+            self.apps_canvas.create_oval# Regular points - smaller for professional look
             self.apps_canvas.create_oval(
-                x - 3, y - 3, x + 3, y + 3,
+                x - 2, y - 2, x + 2, y + 2,  # Smaller points
                 fill=self.accent_tertiary, outline="")
         
-        # Highlight current point
+        # Highlight current point - more subtle highlight
         self.apps_canvas.create_oval(
-            270 - 4, 600 - 4, 270 + 4, 600 + 4,
-            fill=self.accent_secondary, outline="")
+            270 - 3, 600 - 3, 270 + 3, 600 + 3,  # Smaller highlight
+            fill=self.accent_secondary, outline=self.text_color, width=0.5)  # Added subtle outline
     
     def create_control_panel(self):
         """Create bottom control panel"""
@@ -634,11 +671,11 @@ def create_history_tab(self):
         # Draw control panel
         self.draw_control_panel()
         
-        # Control buttons
-        button_width = 180
-        button_height = 40
-        button_radius = 20
-        button_y = 20
+        # Control buttons - improved proportions
+        button_width = 160  # Slightly smaller for better proportions
+        button_height = 36  # Slightly smaller for better proportions
+        button_radius = 6   # Smaller radius for more professional look
+        button_y = 22       # Better vertical centering
         
         # Start Monitoring button
         start_button_bg = self.control_canvas.create_rounded_rectangle(
@@ -660,7 +697,7 @@ def create_history_tab(self):
             radius=button_radius, fill=self.accent_secondary)
         
         self.control_canvas.create_text(
-            220220 + button_width // 2, button_y + button_height // 2,
+            220 + button_width // 2, button_y + button_height // 2,
             text="STOP MONITORING",
             font=self.button_font, fill="white")
         
@@ -682,7 +719,7 @@ def create_history_tab(self):
         self.control_canvas.tag_bind(
             refresh_button_bg, "<Button-1>", lambda e: self.request_windows_list())
         
-        # Get History button
+        # Get History button - more professional outline button
         history_button_bg = self.control_canvas.create_rounded_rectangle(
             620, button_y, 620 + button_width, button_y + button_height,
             radius=button_radius, fill=self.panel_bg, outline=self.accent_primary, width=1)
@@ -696,7 +733,7 @@ def create_history_tab(self):
         self.control_canvas.tag_bind(
             history_button_bg, "<Button-1>", lambda e: self.request_browser_history())
         
-        # Pause Screen button
+        # Pause Screen button - more professional outline button
         pause_button_bg = self.control_canvas.create_rounded_rectangle(
             820, button_y, 820 + button_width, button_y + button_height,
             radius=button_radius, fill=self.panel_bg, outline=self.accent_secondary, width=1)
@@ -715,29 +752,37 @@ def create_history_tab(self):
         width = self.root.winfo_width() if self.root.winfo_width() > 100 else 1280
         height = 80
         
-        # Create rounded panel
+        # Create rounded panel - more professional
         panel_img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(panel_img)
         
-        # Main panel background
+        # Main panel background - more professional
         draw.rounded_rectangle(
             (0, 0, width, height), 
-            radius=20, 
-            fill=(30, 30, 60, 150))  # Semi-transparent
+            radius=8,  # Smaller radius for professional look
+            fill=(28, 48, 72, 180))  # More professional color
         
-        # Gradient overlay
+        # Subtle gradient overlay
         for i in range(width):
-            # Calculate gradient color
-            r = int(30 + (30 - 20) * i / width)
-            g = int(30 + (30 - 20) * i / width)
-            b = int(60 + (60 - 40) * i / width)
-            alpha = 100 - i // 10 if i < 500 else 0
+            # More subtle gradient
+            r = int(28 + (28 - 25) * i / width)
+            g = int(48 + (48 - 43) * i / width)
+            b = int(72 + (72 - 65) * i / width)
+            alpha = 80 - i // 15 if i < 600 else 0  # More subtle fade
             
             if alpha > 0:
                 draw.line([(i, 0), (i, height)], fill=(r, g, b, alpha))
         
-        # Apply slight blur for a modern look
-        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.5))
+        # Apply slight blur for a professional look
+        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.3))  # More subtle blur
+        
+        # Add subtle border
+        draw = ImageDraw.Draw(panel_img)
+        draw.rounded_rectangle(
+            (0, 0, width, height),
+            radius=8,
+            outline=(100, 140, 200, 40),  # Subtle border
+            width=1)
         
         # Convert to PhotoImage
         self.control_frame_img = ImageTk.PhotoImage(panel_img)
@@ -768,43 +813,46 @@ def create_history_tab(self):
         width = int(self.screen_area[2] - self.screen_area[0])
         height = int(self.screen_area[3] - self.screen_area[1])
         
-        # Create sample desktop
-        screen_img = Image.new('RGB', (width, height), (30, 30, 50))
+        # Create sample desktop - more professional look
+        screen_img = Image.new('RGB', (width, height), (25, 35, 60))  # Darker, more professional
         draw = ImageDraw.Draw(screen_img)
         
-        # Draw desktop background
-        for i in range(0, width, 30):
-            for j in range(0, height, 30):
-                # Create grid
-                alpha = random.randint(20, 40)
-                draw.rectangle((i, j, i+28, j+28), 
-                               fill=(40, 40, 70, alpha))
+        # Draw desktop background - more subtle grid
+        for i in range(0, width, 40):  # Larger grid for cleaner look
+            for j in range(0, height, 40):
+                # Create grid - more subtle
+                alpha = random.randint(10, 25)  # Less contrast
+                draw.rectangle((i, j, i+38, j+38), 
+                               fill=(30, 40, 70, alpha))
         
-        # Draw some windows
-        draw.rounded_rectangle((50, 50, 350, 250), radius=10, 
-                              fill=(60, 100, 240))
-        draw.rounded_rectangle((60, 80, 340, 240), radius=5, 
-                              fill=(240, 240, 240))
+        # Draw some windows - more professional
+        draw.rounded_rectangle((50, 50, 350, 250), radius=6,  # Smaller radius
+                              fill=(58, 123, 219))  # Professional blue
+        draw.rounded_rectangle((60, 80, 340, 240), radius=4,  # Smaller radius
+                              fill=(240, 245, 250))  # Slightly off-white for better contrast
         draw.text((65, 60), "Minecraft", fill=(255, 255, 255))
         
-        # Another window
-        draw.rounded_rectangle((200, 150, 500, 350), radius=10, 
-                              fill=(240, 240, 240))
-        draw.rounded_rectangle((200, 150, 500, 180), radius=(10, 10, 0, 0), 
-                              fill=(200, 200, 200))
-        draw.text((210, 160), "Google Chrome", fill=(80, 80, 80))
+        # Another window - more professional
+        draw.rounded_rectangle((200, 150, 500, 350), radius=6,  # Smaller radius
+                              fill=(240, 245, 250))  # Slightly off-white
+        draw.rounded_rectangle((200, 150, 500, 180), radius=(6, 6, 0, 0),  # Only round top corners
+                              fill=(220, 225, 235))  # Subtle title bar
+        draw.text((210, 160), "Google Chrome", fill=(60, 60, 80))  # Darker text
         
-        # Taskbar
+        # Taskbar - more professional
         draw.rectangle((0, height-40, width, height), 
-                      fill=(40, 40, 70))
+                      fill=(30, 40, 70))  # Darker, more professional
         
-        # Start button
-        draw.rounded_rectangle((10, height-35, 50, height-5), radius=5, 
-                              fill=(60, 100, 240))
+        # Add subtle highlight at top of taskbar
+        draw.line((0, height-40, width, height-40), fill=(60, 80, 120, 100), width=1)
         
-        # Clock
+        # Start button - more professional
+        draw.rounded_rectangle((10, height-35, 50, height-5), radius=4,  # Smaller radius
+                              fill=(58, 123, 219))  # Professional blue
+        
+        # Clock - more professional
         current_time = datetime.now().strftime("%H:%M")
-        draw.text((width-60, height-25), current_time, fill=(255, 255, 255))
+        draw.text((width-60, height-25), current_time, fill=(220, 225, 235))  # Slightly off-white
         
         # Convert to PhotoImage
         self.screen_photo = ImageTk.PhotoImage(screen_img)
@@ -822,18 +870,17 @@ def create_history_tab(self):
         self.active_window_id = 1
     
     def start_ambient_animation(self):
-        """Start ambient animation effects"""
-        # Function to update animations
+        """Start refined ambient animation effects"""
         def update_animation():
-            # Pulse effect for connection indicator
-            pulse_size = 2 * math.sin(time.time() * 3) + 2
+            # More subtle pulse effect for connection indicator
+            pulse_size = 1.5 * math.sin(time.time() * 2) + 1.5  # Less dramatic
             self.header_canvas.coords(
                 self.connection_indicator,
                 1050 - pulse_size, 35 - pulse_size, 
                 1070 + pulse_size, 55 + pulse_size)
             
-            # Update activity meter
-            activity_width = 80 + 30 * math.sin(time.time())
+            # More subtle activity meter animation
+            activity_width = 80 + 20 * math.sin(time.time() * 0.7)  # Slower, less extreme
             self.screen_canvas.coords(
                 self.activity_meter,
                 self.screen_width - 200, self.screen_height - 38,
@@ -853,7 +900,7 @@ def create_history_tab(self):
         if color == "green":
             fill_color = self.accent_tertiary
         elif color == "orange":
-            fill_color = "#FFA500"
+            fill_color = "#E9973E"  # Professional orange
         else:
             fill_color = self.accent_secondary
             
@@ -865,50 +912,51 @@ def create_history_tab(self):
         for widget in self.apps_container.winfo_children():
             widget.destroy()
         
-        # Create cards for each app
+        # Create cards for each app - more professional cards
         for i, window in enumerate(self.windows_list):
-            # Create app card
-            card = tk.Frame(self.apps_container, bg=self.panel_bg)
-            card.pack(fill=tk.X, pady=5)
+            # Create app card with subtle border
+            card = tk.Frame(self.apps_container, bg=self.panel_bg, bd=1, 
+                          relief="solid", highlightbackground="#3A5175", highlightthickness=1)
+            card.pack(fill=tk.X, pady=4, padx=2)  # Better spacing
             
             # Add circular icon
-            icon_canvas = tk.Canvas(card, width=40, height=40, 
+            icon_canvas = tk.Canvas(card, width=36, height=36,  # Smaller icon
                                    bg=self.panel_bg, highlightthickness=0)
-            icon_canvas.pack(side=tk.LEFT, padx=10)
+            icon_canvas.pack(side=tk.LEFT, padx=8)  # Better spacing
             
-            # Determine icon color based on app type
+            # Determine icon color based on app type - more professional colors
             if "chrome" in window["process"].lower():
                 icon_color = "#4285F4"  # Google blue
             elif "java" in window["process"].lower():
-                icon_color = "#00C853"  # Minecraft green
+                icon_color = "#27AE60"  # Professional green
             elif "discord" in window["process"].lower():
-                icon_color = "#7289DA"  # Discord purple
+                icon_color = "#5865F2"  # Discord brand color
             else:
                 icon_color = self.accent_primary
             
-            # Draw icon
-            icon_canvas.create_oval(5, 5, 35, 35, fill=icon_color, outline="")
+            # Draw icon - smaller, more refined
+            icon_canvas.create_oval(4, 4, 32, 32, fill=icon_color, outline="")
             
-            # Add app info
+            # Add app info with better spacing
             info_frame = tk.Frame(card, bg=self.panel_bg)
-            info_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=10)
+            info_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=6)
             
-            # App title
+            # App title - better font
             title_label = tk.Label(info_frame, text=window["title"],
                                  font=self.normal_font, bg=self.panel_bg,
                                  fg=self.text_color, anchor="w", justify=tk.LEFT)
-            title_label.pack(fill=tk.X, anchor="w")
+            title_label.pack(fill=tk.X, anchor="w", pady=(3, 0))  # Better spacing
             
-            # Process name
+            # Process name - more subdued
             process_label = tk.Label(info_frame, text=window["process"],
                                   font=self.small_font, bg=self.panel_bg,
                                   fg=self.secondary_text, anchor="w", justify=tk.LEFT)
             process_label.pack(fill=tk.X, anchor="w")
             
-            # View button
+            # View button - more professional
             view_button = ttk.Button(card, text="View", style="Accent.TButton",
                                    command=lambda wid=window["id"]: self.view_application(wid))
-            view_button.pack(side=tk.RIGHT, padx=10)
+            view_button.pack(side=tk.RIGHT, padx=8, pady=4)  # Better spacing
     
     def update_history_list(self):
         """Update browser history list"""
@@ -1238,4 +1286,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = FuturisticParentMonitorApp(root)
     root.mainloop()
-    if_name_=="_main_": main()
+    

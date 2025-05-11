@@ -46,26 +46,26 @@ class FuturisticParentMonitorApp:
         self.root.title("GUARDIAN - Advanced Monitoring System")
         self.root.geometry("1280x800")
         
-        # Set refined professional theme and colors
-        self.bg_color = "#0F1A2B"  # Deep navy background
-        self.secondary_bg = "#162A45"  # Slightly lighter background
-        self.accent_primary = "#3A7BDB"  # Professional blue accent
-        self.accent_secondary = "#E63E6D"  # Professional rose accent
-        self.accent_tertiary = "#39B0CA"  # Professional teal accent
-        self.accent_quaternary = "#5D3E8D"  # Professional purple accent
-        self.text_color = "#F0F4F9"  # Soft white text
-        self.secondary_text = "#A1B4CE"  # Light blue/gray text
-        self.panel_bg = "#1C3048"  # Panel background
-        self.highlight_color = "#2A4365"  # Highlight color
+        # Set refined professional theme and colors - upgraded for maximum visual impact
+        self.bg_color = "#0A1520"  # Deeper, richer navy
+        self.secondary_bg = "#12243A"  # Darker secondary
+        self.accent_primary = "#2563EB"  # More vibrant blue
+        self.accent_secondary = "#DC2626"  # Bolder red
+        self.accent_tertiary = "#0EA5E9"  # Brighter teal
+        self.accent_quaternary = "#7C3AED"  # Richer purple
+        self.text_color = "#F8FAFC"  # Crisp white text
+        self.secondary_text = "#94A3B8"  # More refined gray
+        self.panel_bg = "#1E293B"  # Deeper panel background
+        self.highlight_color = "#334155"  # Darker highlight
         
-        # Custom fonts - more professional
+        # Custom fonts - more professional and modern
         try:
             # Try to use professional system fonts if available
-            self.title_font = tkfont.Font(family="Segoe UI", size=16, weight="bold")
-            self.subtitle_font = tkfont.Font(family="Segoe UI", size=12, weight="bold")
-            self.normal_font = tkfont.Font(family="Segoe UI", size=10)
-            self.small_font = tkfont.Font(family="Segoe UI", size=9)
-            self.button_font = tkfont.Font(family="Segoe UI", size=10, weight="bold")
+            self.title_font = tkfont.Font(family="SF Pro Display", size=16, weight="bold")
+            self.subtitle_font = tkfont.Font(family="SF Pro Display", size=12, weight="bold")
+            self.normal_font = tkfont.Font(family="SF Pro Text", size=10)
+            self.small_font = tkfont.Font(family="SF Pro Text", size=9)
+            self.button_font = tkfont.Font(family="SF Pro Text", size=10, weight="bold")
         except:
             # Fall back to system default
             self.title_font = tkfont.Font(size=16, weight="bold")
@@ -138,57 +138,81 @@ class FuturisticParentMonitorApp:
         self.root.after(100, self.load_sample_data)
         
     def configure_styles(self):
-        """Configure custom styles with professional appearance"""
+        """Configure custom styles with ultra-professional appearance"""
         style = ttk.Style()
         style.theme_use('clam')
         
-        # Configure button styles - more professional
+        # Configure button styles - premium modern
         style.configure("Accent.TButton", 
                         font=self.button_font, 
                         background=self.accent_primary, 
                         foreground="white",
-                        padding=(12, 6))  # More balanced padding
+                        padding=(14, 8))  # Slightly larger for premium feel
         
         style.map("Accent.TButton",
-                background=[('active', self.highlight_color)],
+                background=[('active', '#1e40af'), ('pressed', '#1e3a8a')],
                 relief=[('pressed', 'sunken')])
         
         style.configure("Warning.TButton", 
                         font=self.button_font, 
                         background=self.accent_secondary,
                         foreground="white",
-                        padding=(12, 6))
+                        padding=(14, 8))
+                        
+        style.map("Warning.TButton",
+                background=[('active', '#b91c1c'), ('pressed', '#991b1b')],
+                relief=[('pressed', 'sunken')])
         
         style.configure("Success.TButton", 
                         font=self.button_font, 
                         background=self.accent_tertiary,
                         foreground="white",
-                        padding=(12, 6))
+                        padding=(14, 8))
+                        
+        style.map("Success.TButton",
+                background=[('active', '#0369a1'), ('pressed', '#0c4a6e')],
+                relief=[('pressed', 'sunken')])
         
-        # Configure treeview styles - more professional
+        # Configure outline button styles
+        style.configure("OutlineAccent.TButton", 
+                        font=self.button_font, 
+                        background=self.panel_bg,
+                        foreground=self.text_color,
+                        padding=(14, 8),
+                        borderwidth=1)
+                        
+        style.map("OutlineAccent.TButton",
+                background=[('active', self.highlight_color)],
+                foreground=[('active', self.accent_primary)],
+                relief=[('pressed', 'sunken')])
+        
+        # Configure treeview styles - premium
         style.configure("Treeview", 
                         background=self.panel_bg,
                         foreground=self.text_color,
                         fieldbackground=self.panel_bg,
-                        borderwidth=0)
+                        borderwidth=0,
+                        rowheight=28)  # Increased for premium look
         
         style.map("Treeview",
-                background=[('selected', self.highlight_color)],
+                background=[('selected', self.accent_primary)],
                 foreground=[('selected', self.text_color)])
         
         style.configure("Treeview.Heading", 
                         background=self.highlight_color,
                         foreground=self.text_color,
                         relief="flat",
-                        font=self.normal_font)
+                        font=self.normal_font,
+                        padding=6)  # Added padding for premium look
         
-        # Configure entry styles - more professional
+        # Configure entry styles - premium glass effect
         style.configure("TEntry", 
                         background=self.panel_bg,
                         foreground=self.text_color,
                         fieldbackground=self.panel_bg,
                         insertcolor=self.text_color,
-                        borderwidth=1)
+                        borderwidth=1,
+                        padding=8)  # Added padding for premium look
     
     def create_gradient_background(self):
         """Create a refined gradient background with subtle grid"""
@@ -197,35 +221,64 @@ class FuturisticParentMonitorApp:
         self.bg_image = Image.new('RGBA', (width, height), self.bg_color)
         draw = ImageDraw.Draw(self.bg_image)
         
-        # Create subtle radial gradient
-        for i in range(width + height):
-            # More subtle gradient
-            alpha = int(200 - i * 0.08) if i * 0.08 < 200 else 0
-            if alpha > 0:
+        # Create enhanced radial gradient with higher quality
+        for i in range(0, width + height, 2):  # Smaller steps for smoother gradient
+            # More sophisticated gradient with multiple color points
+            alpha_base = int(180 - i * 0.06) if i * 0.06 < 180 else 0
+            if alpha_base > 0:
+                # Primary accent gradient from top left
                 draw.ellipse((0 - i, 0 - i, i, i), 
-                            fill=(58, 123, 213, alpha//12))  # More subtle blue
+                            fill=(37, 99, 235, alpha_base//8))  # Refined blue glow
+                
+                # Secondary accent gradient from bottom right
                 draw.ellipse((width - i, height - i, width + i, height + i), 
-                            fill=(93, 62, 141, alpha//12))   # More subtle purple
+                            fill=(124, 58, 237, alpha_base//9))  # Refined purple glow
+                
+                # Third accent point for added dimension
+                if i % 3 == 0:  # Only some iterations for performance
+                    draw.ellipse((width//2 - i//2, 0 - i//3, width//2 + i//2, i//3), 
+                                fill=(14, 165, 233, alpha_base//15))  # Subtle cyan highlight
         
-        # Add refined noise texture (less dense)
-        for _ in range(500):  # Reduced from 1000
+        # Add professional noise texture (more refined, less dense)
+        for _ in range(400):  # Reduced density
             x = random.randint(0, width - 1)
             y = random.randint(0, height - 1)
-            alpha = random.randint(3, 15)  # More subtle particles
-            draw.point((x, y), fill=(255, 255, 255, alpha))
+            size = random.randint(1, 2)  # Vary the size for depth
+            alpha = random.randint(2, 10)  # More subtle particles
+            
+            # Vary the color slightly for a more dynamic feel
+            color_variant = random.randint(-20, 20)
+            r = min(255, max(0, 255 + color_variant))
+            g = min(255, max(0, 255 + color_variant))
+            b = min(255, max(0, 255 + color_variant))
+            
+            draw.rectangle((x, y, x+size, y+size), fill=(r, g, b, alpha))
         
-        # Apply slight blur
-        self.bg_image = self.bg_image.filter(ImageFilter.GaussianBlur(radius=15))
+        # Apply sophisticated blur with multiple passes
+        self.bg_image = self.bg_image.filter(ImageFilter.GaussianBlur(radius=20))
+        
+        # Add subtle vignette effect for depth
+        vignette = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+        vignette_draw = ImageDraw.Draw(vignette)
+        
+        # Create radial gradient for vignette
+        for i in range(0, max(width, height), 4):
+            alpha = int(i * 0.15) if i * 0.15 < 60 else 60  # Max 60 alpha (subtle)
+            vignette_draw.ellipse((width//2 - i, height//2 - i, width//2 + i, height//2 + i), 
+                                fill=(0, 0, 0, 0), outline=(0, 0, 0, alpha))
+        
+        # Apply vignette
+        self.bg_image = Image.alpha_composite(self.bg_image.convert('RGBA'), vignette)
         
         # Convert to PhotoImage and display
         self.bg_photo = ImageTk.PhotoImage(self.bg_image)
         self.canvas.create_image(0, 0, image=self.bg_photo, anchor="nw")
         
-        # Add professional grid lines (thinner, more subtle)
-        for i in range(0, width, 100):
-            self.canvas.create_line(i, 0, i, height, fill=f"#{40:02x}{50:02x}{80:02x}", width=0.5)
-        for i in range(0, height, 100):
-            self.canvas.create_line(0, i, width, i, fill=f"#{40:02x}{50:02x}{80:02x}", width=0.5)
+        # Add professional grid lines (thinner, more refined)
+        for i in range(0, width, 80):  # Wider spacing
+            self.canvas.create_line(i, 0, i, height, fill=f"#{30:02x}{40:02x}{60:02x}", width=0.5, dash=(4, 4))  # Dashed line
+        for i in range(0, height, 80):
+            self.canvas.create_line(0, i, width, i, fill=f"#{30:02x}{40:02x}{60:02x}", width=0.5, dash=(4, 4))  # Dashed line
     
     def create_header(self):
         """Create futuristic curved header bar"""
@@ -277,7 +330,7 @@ class FuturisticParentMonitorApp:
                                                        anchor="w")
     
     def draw_curved_header(self):
-        """Draw curved gradient header"""
+        """Draw curved gradient header with professional glossy effect"""
         width = self.root.winfo_width()
         height = self.header_height
         
@@ -285,35 +338,72 @@ class FuturisticParentMonitorApp:
         header_img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(header_img)
         
-        # Draw gradient
+        # Draw sophisticated gradient
         for i in range(width):
-            # Calculate gradient color - more professional
-            r = int(58 + (58 - 45) * i / width)
-            g = int(123 + (123 - 90) * i / width)
-            b = int(219 + (219 - 180) * i / width)
-            draw.line([(i, 0), (i, height)], fill=(r, g, b))
+            # Calculate gradient color - modern professional scheme
+            progress = i / width
+            
+            # Use a multi-stop gradient for a more professional look
+            if progress < 0.3:
+                # Start with deeper blue
+                r = int(37 + (99 - 37) * progress / 0.3)
+                g = int(99 + (109 - 99) * progress / 0.3)
+                b = int(235 + (239 - 235) * progress / 0.3)
+            elif progress < 0.7:
+                # Transition to brighter mid tone
+                midpoint = (progress - 0.3) / 0.4
+                r = int(99 + (79 - 99) * midpoint)
+                g = int(109 + (128 - 109) * midpoint)
+                b = int(239 + (248 - 239) * midpoint)
+            else:
+                # End with deeper accent
+                endpoint = (progress - 0.7) / 0.3
+                r = int(79 + (99 - 79) * endpoint)
+                g = int(128 + (139 - 128) * endpoint)
+                b = int(248 + (255 - 248) * endpoint)
+                
+            draw.line([(i, 0), (i, height)], fill=(r, g, b, 230))
         
-        # Apply curve at the bottom
+        # Apply curve at the bottom - more refined
         mask = Image.new('L', (width, height), 0)
         mask_draw = ImageDraw.Draw(mask)
         
-        # Draw curve - more subtle
-        mask_draw.rectangle((0, 0, width, height - 20), fill=255)
+        # Draw curve - subtle with perfect bezier-like quality
+        mask_draw.rectangle((0, 0, width, height - 15), fill=255)
+        
+        # More natural curved bottom with sine curve
         for x in range(width):
-            y_offset = int(8 * math.sin(math.pi * x / width))  # Less dramatic curve
-            mask_draw.rectangle((x, height - 20, x + 1, height - 20 + y_offset), fill=255)
+            # Use sine function for more natural curve
+            curve_height = int(6 * math.sin(math.pi * x / width * 1.5 + 0.2) + 7)
+            mask_draw.rectangle((x, height - 15, x + 1, height - 15 + curve_height), fill=255)
+        
+        # Add subtle highlight for glossy effect at top
+        for i in range(10):
+            # Decreasing alpha for gradient highlight
+            highlight_alpha = 60 - i * 6
+            y_pos = 6 + i
+            draw.line([(0, y_pos), (width, y_pos)], fill=(255, 255, 255, highlight_alpha))
         
         # Apply mask
         header_img.putalpha(mask)
         
         # Apply slight blur for smoothness
-        header_img = header_img.filter(ImageFilter.GaussianBlur(radius=1))
+        header_img = header_img.filter(ImageFilter.GaussianBlur(radius=0.7))
         
         # Convert to PhotoImage
         self.header_photo = ImageTk.PhotoImage(header_img)
         
         # Display header
         self.header_canvas.create_image(0, 0, image=self.header_photo, anchor="nw")
+        
+        # Add subtle divider line at bottom
+        self.header_canvas.create_line(
+            0, height-1, width, height-1, 
+            fill=f"#{255:02x}{255:02x}{255:02x}", 
+            width=1,
+            dash=(2, 2),
+            stipple="gray25"
+        )
     
     def create_content_area(self):
         """Create main content area with screen view and apps list"""
@@ -374,26 +464,58 @@ class FuturisticParentMonitorApp:
         self.draw_activity_meter()
     
     def draw_activity_meter(self):
-        """Draw activity meter with professional styling"""
-        # Background - more subtle rounded corners
+        """Draw activity meter with premium glossy styling"""
+        # Premium background with depth effect - outer glow
         self.screen_canvas.create_rounded_rectangle(
-            self.screen_width - 200, self.screen_height - 38,
-            self.screen_width - 50, self.screen_height - 22,
-            radius=4, fill=self.secondary_bg, outline=self.highlight_color)
+            self.screen_width - 210, self.screen_height - 43,
+            self.screen_width - 40, self.screen_height - 17,
+            radius=13, fill=None, outline=self.highlight_color)
+            
+        # Main background - inset with glass effect
+        self.screen_canvas.create_rounded_rectangle(
+            self.screen_width - 205, self.screen_height - 40,
+            self.screen_width - 45, self.screen_height - 20,
+            radius=10, fill=self.secondary_bg, outline=self.highlight_color)
         
-        # Active part (will be updated) - professional gradient
+        # Activity indicator (will be updated) - premium gradient
         self.activity_meter = self.screen_canvas.create_rounded_rectangle(
-            self.screen_width - 200, self.screen_height - 38,
-            self.screen_width - 120, self.screen_height - 22,
-            radius=4, fill=self.accent_tertiary, outline="")
+            self.screen_width - 205, self.screen_height - 40,
+            self.screen_width - 125, self.screen_height - 20,
+            radius=10, fill=self.accent_tertiary, outline="")
         
-        # Label - better positioned
+        # Add glossy highlight to the activity meter
+        self.activity_highlight = self.screen_canvas.create_rounded_rectangle(
+            self.screen_width - 205, self.screen_height - 40,
+            self.screen_width - 125, self.screen_height - 30,
+            radius=5, fill=None, outline=self.text_color, width=0.5)
+        
+        # Label with premium styling
         self.screen_canvas.create_text(
             self.screen_width - 125, self.screen_height - 30,
             text="ACTIVITY", font=self.small_font, fill=self.text_color)
+            
+        # Premium dot indicators
+        dot_positions = [
+            (self.screen_width - 185, "#DC2626"),  # Red alert
+            (self.screen_width - 165, "#2563EB"),  # Blue normal
+            (self.screen_width - 145, "#0EA5E9"),  # Cyan low
+        ]
+        
+        for x_pos, color in dot_positions:
+            # Create dot with glow effect
+            self.screen_canvas.create_oval(
+                x_pos - 3, self.screen_height - 54,
+                x_pos + 3, self.screen_height - 48,
+                fill=color, outline="")
+                
+            # Add subtle glow
+            self.screen_canvas.create_oval(
+                x_pos - 4, self.screen_height - 55,
+                x_pos + 4, self.screen_height - 47,
+                fill="", outline=color, width=0.5)
     
     def draw_screen_panel(self):
-        """Draw screen panel with professional styling"""
+        """Draw screen panel with premium professional styling"""
         # Get panel dimensions
         self.screen_width = self.screen_panel.winfo_width() 
         if self.screen_width < 100:
@@ -403,44 +525,138 @@ class FuturisticParentMonitorApp:
         if self.screen_height < 100:
             self.screen_height = 600
         
-        # Create rounded panel with more subtle corners
+        # Create premium rounded panel
         panel_img = Image.new('RGBA', (self.screen_width, self.screen_height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(panel_img)
         
-        # Main panel background - more subtle transparency and refined color
+        # Main panel background - premium dark glass effect
         draw.rounded_rectangle(
             (0, 0, self.screen_width, self.screen_height), 
-            radius=10,  # Reduced from 20 for more professional look
-            fill=(28, 48, 72, 180))
+            radius=12,  # Premium rounded corners
+            fill=(20, 30, 50, 210))  # More contrasting, premium dark
         
-        # Header bar - more professional gradient
+        # Add subtle glass-like highlight at the top
+        for i in range(6):
+            highlight_alpha = 25 - i * 4
+            highlight_y = 4 + i
+            draw.line(
+                [(10, highlight_y), (self.screen_width - 10, highlight_y)],
+                fill=(255, 255, 255, highlight_alpha))
+        
+        # Header bar - premium gradient
+        # Create gradient manually for more control
+        header_height = 70
+        for i in range(self.screen_width):
+            # Calculate gradient position
+            pos = i / self.screen_width
+            
+            # Multi-stop gradient for more premium look
+            if pos < 0.4:
+                # Start with primary accent
+                r = int(37 + (59 - 37) * pos / 0.4)
+                g = int(99 + (130 - 99) * pos / 0.4)
+                b = int(235 + (246 - 235) * pos / 0.4)
+            else:
+                # Transition to secondary tone
+                r = int(59 + (76 - 59) * (pos - 0.4) / 0.6)
+                g = int(130 + (110 - 130) * (pos - 0.4) / 0.6)
+                b = int(246 + (225 - 246) * (pos - 0.4) / 0.6)
+                
+            # Draw vertical line of the gradient
+            for j in range(header_height):
+                # Add vertical gradient as well
+                alpha = 230 - (j * 30 // header_height)
+                draw.point((i, j), fill=(r, g, b, alpha))
+        
+        # Ensure smooth rounded corners for header
         draw.rounded_rectangle(
-            (0, 0, self.screen_width, 70),
-            radius=10,
-            fill=(58, 123, 219, 230))  # More transparent, professional blue
+            (0, 0, self.screen_width, header_height),
+            radius=12,
+            fill=None,  # No fill, just outline
+            outline=(60, 120, 240, 100),  # Subtle outline
+            width=1)
         
-        # Bottom status bar - more professional
+        # Bottom status bar - premium gradient glass effect
+        status_bar_height = 60
+        for i in range(self.screen_width):
+            # Calculate gradient position
+            pos = i / self.screen_width
+            
+            # Multi-stop gradient for premium look
+            if pos < 0.3:
+                r, g, b = 30, 40, 70
+            elif pos < 0.7:
+                r = int(30 + (40 - 30) * (pos - 0.3) / 0.4)
+                g = int(40 + (50 - 40) * (pos - 0.3) / 0.4)
+                b = int(70 + (90 - 70) * (pos - 0.3) / 0.4)
+            else:
+                r = int(40 + (50 - 40) * (pos - 0.7) / 0.3)
+                g = int(50 + (60 - 50) * (pos - 0.7) / 0.3)
+                b = int(90 + (110 - 90) * (pos - 0.7) / 0.3)
+                
+            # Draw vertical line with gradient
+            for j in range(status_bar_height):
+                y_pos = self.screen_height - status_bar_height + j
+                # Add vertical gradient
+                alpha = 180 + (j * 20 // status_bar_height)
+                draw.point((i, y_pos), fill=(r, g, b, alpha))
+        
+        # Ensure smooth rounded corners for status bar
         draw.rounded_rectangle(
-            (0, self.screen_height - 60, self.screen_width, self.screen_height),
-            radius=10,  # Use single value for radius
-            fill=(30, 40, 70, 180))
+            (0, self.screen_height - status_bar_height, self.screen_width, self.screen_height),
+            radius=12,
+            fill=None,  # No fill, just outline
+            outline=(60, 120, 240, 40),  # Subtle outline
+            width=1)
         
-        # Main screen area - cleaner look
+        # Main screen area - premium inset glass effect
         self.screen_area = (20, 80, self.screen_width - 20, self.screen_height - 70)
+        
+        # Draw inner shadow for inset effect
+        shadow_width = 2
+        for i in range(shadow_width):
+            alpha = 80 - (i * 80 // shadow_width)
+            draw.rounded_rectangle(
+                (self.screen_area[0] + i, 
+                 self.screen_area[1] + i, 
+                 self.screen_area[2] - i, 
+                 self.screen_area[3] - i),
+                radius=8,
+                fill=None,
+                outline=(0, 0, 0, alpha),
+                width=1)
+        
+        # Main screen background - premium glass effect
         draw.rounded_rectangle(
             self.screen_area,
-            radius=6,  # Smaller radius for more professional look
-            fill=(25, 35, 60, 140))  # Slightly more opaque for better contrast
+            radius=8,  # Premium rounded corners
+            fill=(15, 25, 45, 180))  # Darker for better contrast
         
-        # Apply slight blur for a professional look
-        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.3))  # More subtle blur
+        # Add inner highlight for depth
+        highlight_width = 1
+        for i in range(highlight_width):
+            alpha = 40 - (i * 40 // highlight_width)
+            offset = i + 1
+            draw.rounded_rectangle(
+                (self.screen_area[0] + offset, 
+                 self.screen_area[1] + offset, 
+                 self.screen_area[2] - offset, 
+                 self.screen_area[3] - offset),
+                radius=8 - offset if 8 - offset > 0 else 1,
+                fill=None,
+                outline=(255, 255, 255, alpha),
+                width=1)
         
-        # Add a subtle border to enhance professionalism
+        # Apply refined blur for professional polish
+        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.5))
+        
+        # Add subtle overall depth with a refined border
         draw = ImageDraw.Draw(panel_img)
         draw.rounded_rectangle(
             (0, 0, self.screen_width, self.screen_height),
-            radius=10,
-            outline=(100, 140, 200, 40),  # Subtle border
+            radius=12,
+            fill=None,
+            outline=(100, 140, 255, 30),  # Subtle blue glow
             width=1)
         
         # Convert to PhotoImage
@@ -479,42 +695,93 @@ class FuturisticParentMonitorApp:
         self.create_analytics_panel()
     
     def draw_apps_panel(self):
-        """Draw apps panel with curved borders"""
+        """Draw apps panel with premium glass effect and modern design"""
         # Get panel dimensions
         apps_width = self.apps_panel_width
         apps_height = 600  # Default height
         
-        # Create rounded panel
+        # Create premium rounded panel
         panel_img = Image.new('RGBA', (apps_width, apps_height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(panel_img)
         
-        # Main panel background
+        # Main panel background - premium dark glass effect
         draw.rounded_rectangle(
             (0, 0, apps_width, apps_height), 
-            radius=10,  # More professional radius
-            fill=(28, 48, 72, 180))  # More professional color
+            radius=12,  # Premium rounded corners
+            fill=(20, 30, 50, 210))  # Premium dark
         
-        # Tab bar
+        # Add subtle glass-like horizontal highlight
+        for i in range(4):
+            highlight_alpha = 20 - i * 5
+            highlight_y = 4 + i
+            draw.line(
+                [(10, highlight_y), (apps_width - 10, highlight_y)],
+                fill=(255, 255, 255, highlight_alpha))
+        
+        # Tab bar with multi-stop gradient
+        for i in range(apps_width):
+            pos = i / apps_width
+            
+            # Multi-stop gradient
+            if pos < 0.3:
+                r = int(25 + (30 - 25) * pos / 0.3)
+                g = int(35 + (40 - 35) * pos / 0.3)
+                b = int(60 + (70 - 60) * pos / 0.3)
+            else:
+                r = int(30 + (35 - 30) * (pos - 0.3) / 0.7)
+                g = int(40 + (45 - 40) * (pos - 0.3) / 0.7)
+                b = int(70 + (80 - 70) * (pos - 0.3) / 0.7)
+                
+            # Draw vertical gradient for tab bar
+            for j in range(50):  # 50px height
+                alpha = 220 - (j * 40 // 50)  # Vertical gradient
+                draw.point((i, j), fill=(r, g, b, alpha))
+        
+        # Ensure rounded corners for tab bar
         draw.rounded_rectangle(
             (0, 0, apps_width, 50),
-            radius=10,  # Changed from (10, 10, 0, 0) to single value
-            fill=(25, 35, 60, 220))  # Darker, more professional
+            radius=12,  # Premium rounded corners
+            fill=None,
+            outline=(60, 80, 120, 40),
+            width=1)
         
-        # Active tab
+        # Active tab with premium gradient effect
+        for i in range(apps_width // 2):
+            pos = i / (apps_width // 2)
+            
+            # Multi-stop gradient for premium effect
+            if pos < 0.3:
+                r = int(37 + (45 - 37) * pos / 0.3)
+                g = int(99 + (110 - 99) * pos / 0.3)
+                b = int(235 + (245 - 235) * pos / 0.3)
+            else:
+                r = int(45 + (60 - 45) * (pos - 0.3) / 0.7)
+                g = int(110 + (135 - 110) * (pos - 0.3) / 0.7)
+                b = int(245 + (255 - 245) * (pos - 0.3) / 0.7)
+                
+            # Draw vertical gradient for active tab
+            for j in range(50):  # 50px height
+                alpha = 230 - (j * 30 // 50)  # Vertical gradient
+                draw.point((i, j), fill=(r, g, b, alpha))
+        
+        # Ensure rounded corners for active tab
         draw.rounded_rectangle(
             (0, 0, apps_width // 2, 50),
-            radius=10,  # Changed from (10, 10, 0, 0) to single value
-            fill=(58, 123, 219, 230))  # Professional blue
+            radius=12,  # Premium rounded corners
+            fill=None,
+            outline=(100, 150, 255, 60),
+            width=1)
         
-        # Apply slight blur for a modern look
-        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.3))  # More subtle blur
+        # Apply refined blur for professional polish
+        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.5))
         
-        # Add subtle border
+        # Add subtle glow border
         draw = ImageDraw.Draw(panel_img)
         draw.rounded_rectangle(
             (0, 0, apps_width, apps_height),
-            radius=10,
-            outline=(100, 140, 200, 40),  # Subtle border
+            radius=12,
+            fill=None,
+            outline=(100, 140, 255, 30),  # Subtle blue glow
             width=1)
         
         # Convert to PhotoImage
@@ -775,40 +1042,61 @@ class FuturisticParentMonitorApp:
             pause_button_bg, "<Button-1>", lambda e: self.pause_screen())
     
     def draw_control_panel(self):
-        """Draw control panel with curved borders"""
+        """Draw premium control panel with curved borders and glass effect"""
         width = self.root.winfo_width() if self.root.winfo_width() > 100 else 1280
         height = 80
         
-        # Create rounded panel - more professional
+        # Create premium rounded panel
         panel_img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(panel_img)
         
-        # Main panel background - more professional
+        # Main panel background - premium dark glass effect
         draw.rounded_rectangle(
             (0, 0, width, height), 
-            radius=8,  # Smaller radius for professional look
-            fill=(28, 48, 72, 180))  # More professional color
+            radius=12,  # Premium rounded corners
+            fill=(20, 30, 50, 210))  # More contrasting, premium dark
         
-        # Subtle gradient overlay
+        # Add subtle glass-like horizontal highlight
+        for i in range(4):
+            highlight_alpha = 20 - i * 5
+            highlight_y = 4 + i
+            draw.line(
+                [(10, highlight_y), (width - 10, highlight_y)],
+                fill=(255, 255, 255, highlight_alpha))
+        
+        # Create premium gradient overlay
         for i in range(width):
-            # More subtle gradient
-            r = int(28 + (28 - 25) * i / width)
-            g = int(48 + (48 - 43) * i / width)
-            b = int(72 + (72 - 65) * i / width)
-            alpha = 80 - i // 15 if i < 600 else 0  # More subtle fade
+            # Calculate position
+            pos = i / width
+            
+            # Use multi-stop gradient for premium look
+            if pos < 0.3:
+                r, g, b = 30, 40, 60
+            elif pos < 0.7:
+                r = int(30 + (35 - 30) * (pos - 0.3) / 0.4)
+                g = int(40 + (45 - 40) * (pos - 0.3) / 0.4)
+                b = int(60 + (70 - 60) * (pos - 0.3) / 0.4)
+            else:
+                r = int(35 + (40 - 35) * (pos - 0.7) / 0.3)
+                g = int(45 + (50 - 45) * (pos - 0.7) / 0.3)
+                b = int(70 + (80 - 70) * (pos - 0.7) / 0.3)
+                
+            # Apply with depth-enhancing alpha gradient
+            alpha = 100 - (i * 30 // width)
             
             if alpha > 0:
                 draw.line([(i, 0), (i, height)], fill=(r, g, b, alpha))
         
-        # Apply slight blur for a professional look
-        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.3))  # More subtle blur
+        # Apply premium blur effect
+        panel_img = panel_img.filter(ImageFilter.GaussianBlur(radius=0.5))
         
-        # Add subtle border
+        # Add subtle glow border
         draw = ImageDraw.Draw(panel_img)
         draw.rounded_rectangle(
             (0, 0, width, height),
-            radius=8,
-            outline=(100, 140, 200, 40),  # Subtle border
+            radius=12,
+            fill=None,
+            outline=(100, 140, 255, 30),  # Subtle blue glow
             width=1)
         
         # Convert to PhotoImage
@@ -835,51 +1123,110 @@ class FuturisticParentMonitorApp:
         self.update_status("Ready to connect", "orange")
     
     def create_sample_screen(self):
-        """Create a sample screen image"""
+        """Create a high-quality professional sample screen image"""
         # Create a sample screen image
         width = int(self.screen_area[2] - self.screen_area[0])
         height = int(self.screen_area[3] - self.screen_area[1])
         
-        # Create sample desktop - more professional look
-        screen_img = Image.new('RGB', (width, height), (25, 35, 60))  # Darker, more professional
+        # Create premium desktop background
+        screen_img = Image.new('RGB', (width, height), (15, 25, 45))  # Darker background
         draw = ImageDraw.Draw(screen_img)
         
-        # Draw desktop background - more subtle grid
-        for i in range(0, width, 40):  # Larger grid for cleaner look
-            for j in range(0, height, 40):
-                # Create grid - more subtle
-                alpha = random.randint(10, 25)  # Less contrast
-                draw.rectangle((i, j, i+38, j+38), 
-                               fill=(30, 40, 70, alpha))
+        # Draw modern desktop background with subtle grid
+        # First draw gradient background
+        for y in range(height):
+            # Vertical gradient for more depth
+            r = int(15 + (25 - 15) * y / height)
+            g = int(25 + (35 - 25) * y / height)
+            b = int(45 + (60 - 45) * y / height)
+            
+            draw.line([(0, y), (width, y)], fill=(r, g, b))
         
-        # Draw some windows - more professional
-        draw.rounded_rectangle((50, 50, 350, 250), radius=6,  # Smaller radius
-                              fill=(58, 123, 219))  # Professional blue
-        draw.rounded_rectangle((60, 80, 340, 240), radius=4,  # Smaller radius
-                              fill=(240, 245, 250))  # Slightly off-white for better contrast
-        draw.text((65, 60), "Minecraft", fill=(255, 255, 255))
+        # Add refined grid pattern
+        for i in range(0, width, 50):
+            for j in range(0, height, 50):
+                # Create subtle grid squares
+                alpha = random.randint(5, 15)  # Very subtle
+                draw.rectangle(
+                    (i, j, i+48, j+48), 
+                    fill=(30, 40, 70, alpha),
+                    outline=(40, 60, 100, alpha))
         
-        # Another window - more professional
-        draw.rounded_rectangle((200, 150, 500, 350), radius=6,  # Smaller radius
-                              fill=(240, 245, 250))  # Slightly off-white
-        draw.rounded_rectangle((200, 150, 500, 180), radius=6,  # Changed from (6, 6, 0, 0) to single value
-                              fill=(220, 225, 235))  # Subtle title bar
-        draw.text((210, 160), "Google Chrome", fill=(60, 60, 80))  # Darker text
+        # Add subtle particles for modern look
+        for _ in range(100):
+            x = random.randint(0, width - 1)
+            y = random.randint(0, height - 1)
+            size = random.randint(1, 3)
+            alpha = random.randint(20, 60)
+            draw.ellipse(
+                (x, y, x+size, y+size), 
+                fill=(200, 220, 255, alpha))
         
-        # Taskbar - more professional
-        draw.rectangle((0, height-40, width, height), 
-                      fill=(30, 40, 70))  # Darker, more professional
+        # Draw premium looking windows - Minecraft window
+        self.draw_premium_window(
+            draw, 50, 50, 450, 300, 
+            "Minecraft 1.19", "#62B47A", 
+            game_window=True)
         
-        # Add subtle highlight at top of taskbar
-        draw.line((0, height-40, width, height-40), fill=(60, 80, 120, 100), width=1)
+        # Chrome window with search
+        self.draw_premium_window(
+            draw, 200, 150, 550, 400, 
+            "Google Chrome - Homework Research", "#4285F4",
+            browser=True, url="www.khanacademy.org/math/geometry")
         
-        # Start button - more professional
-        draw.rounded_rectangle((10, height-35, 50, height-5), radius=4,  # Smaller radius
-                              fill=(58, 123, 219))  # Professional blue
+        # File explorer window
+        self.draw_premium_window(
+            draw, 400, 80, 700, 250, 
+            "File Explorer - Documents", "#0078D7")
+            
+        # Modern taskbar
+        taskbar_height = 40
+        # Taskbar background with glass effect
+        draw.rectangle(
+            (0, height-taskbar_height, width, height),
+            fill=(20, 30, 50))
+            
+        # Add glass highlight
+        draw.rectangle(
+            (0, height-taskbar_height, width, height-taskbar_height+1),
+            fill=(60, 80, 120))
         
-        # Clock - more professional
+        # Start button
+        start_width = 45
+        draw.rounded_rectangle(
+            (10, height-taskbar_height+5, 10+start_width, height-5),
+            radius=4,
+            fill=(37, 99, 235))
+            
+        # Taskbar icons
+        icon_size = 26
+        icon_y = height - taskbar_height//2 - icon_size//2
+        
+        # Windows icon
+        draw.rectangle(
+            (15, icon_y+10, 15+start_width-10, icon_y+16),
+            fill=(255, 255, 255))
+            
+        # App icons
+        icons = [
+            {"color": "#4285F4", "pos": 70},  # Chrome
+            {"color": "#62B47A", "pos": 120},  # Minecraft
+            {"color": "#0078D7", "pos": 170},  # Explorer
+            {"color": "#5865F2", "pos": 220},  # Discord
+        ]
+        
+        for icon in icons:
+            draw.rounded_rectangle(
+                (icon["pos"], icon_y, icon["pos"]+icon_size, icon_y+icon_size),
+                radius=4,
+                fill=icon["color"])
+        
+        # Clock
         current_time = datetime.now().strftime("%H:%M")
-        draw.text((width-60, height-25), current_time, fill=(220, 225, 235))  # Slightly off-white
+        draw.text(
+            (width-70, height-taskbar_height+13), 
+            current_time, 
+            fill=(240, 240, 240))
         
         # Convert to PhotoImage
         self.screen_photo = ImageTk.PhotoImage(screen_img)
@@ -890,34 +1237,331 @@ class FuturisticParentMonitorApp:
             image=self.screen_photo, anchor="nw")
         
         # Update current view label
-        self.view_label_text = "Current View: Minecraft"
+        self.view_label_text = "Current View: Minecraft 1.19"
         self.screen_canvas.itemconfig(self.view_label, text=self.view_label_text)
         
         # Update active window
         self.active_window_id = 1
     
+    def draw_premium_window(self, draw, x, y, width, height, title, color, browser=False, game_window=False, url=None):
+        """Draw a premium looking window for the sample screen"""
+        # Window border with rounded corners
+        draw.rounded_rectangle(
+            (x, y, width, height),
+            radius=8,
+            fill=(240, 245, 250))
+        
+        # Window title bar
+        title_height = 30
+        draw.rounded_rectangle(
+            (x, y, width, y+title_height),
+            radius=8,
+            fill=color)
+        
+        # Make sure bottom corners of title bar aren't rounded
+        draw.rectangle(
+            (x, y+title_height-8, width, y+title_height),
+            fill=color)
+        
+        # Window title
+        text_color = (255, 255, 255)
+        draw.text((x+10, y+8), title, fill=text_color)
+        
+        # Window controls
+        controls = [
+            {"color": (255, 75, 75), "offset": 20},    # Close
+            {"color": (255, 205, 65), "offset": 40},   # Minimize
+            {"color": (80, 205, 75), "offset": 60},    # Maximize
+        ]
+        
+        for control in controls:
+            draw.ellipse(
+                (width-control["offset"], y+8, 
+                 width-control["offset"]+14, y+22),
+                fill=control["color"])
+        
+        # Window content based on type
+        if browser:
+            # Address bar
+            draw.rectangle(
+                (x+10, y+title_height+10, width-10, y+title_height+40),
+                fill=(230, 235, 240),
+                outline=(200, 210, 220))
+                
+            # URL
+            if url:
+                draw.text(
+                    (x+20, y+title_height+18), 
+                    url, 
+                    fill=(70, 90, 120))
+            
+            # Browser content - placeholder
+            # Tab bar
+            draw.rectangle(
+                (x+5, y+title_height, width-5, y+title_height+10),
+                fill=(220, 225, 230))
+                
+            # Content area with academic website mockup
+            content_start_y = y+title_height+45
+            
+            # Header area
+            draw.rectangle(
+                (x+10, content_start_y, width-10, content_start_y+40),
+                fill=(60, 90, 160))
+                
+            draw.text(
+                (x+30, content_start_y+15), 
+                "Khan Academy - Mathematics", 
+                fill=(255, 255, 255))
+            
+            # Content columns
+            draw.rectangle(
+                (x+20, content_start_y+50, x+160, content_start_y+90),
+                fill=(240, 240, 240))
+                
+            draw.rectangle(
+                (x+20, content_start_y+100, x+160, content_start_y+140),
+                fill=(240, 240, 240))
+                
+            draw.rectangle(
+                (x+180, content_start_y+50, width-20, content_start_y+170),
+                fill=(245, 245, 250))
+        
+        elif game_window:
+            # Minecraft-style content
+            content_start_y = y+title_height+5
+            
+            # Game menu background
+            draw.rectangle(
+                (x+5, content_start_y, width-5, height-5),
+                fill=(60, 90, 60))
+                
+            # Menu options
+            options = ["Play Game", "Multiplayer", "Settings", "Quit Game"]
+            
+            for i, option in enumerate(options):
+                # Button
+                button_y = content_start_y + 40 + i * 50
+                draw.rounded_rectangle(
+                    (x+80, button_y, width-80, button_y+40),
+                    radius=4,
+                    fill=(80, 120, 80))
+                    
+                # Text
+                text_width = len(option) * 6
+                text_x = (width + x) // 2 - text_width // 2
+                draw.text(
+                    (text_x, button_y+15), 
+                    option, 
+                    fill=(240, 240, 240))
+                    
+            # Title
+            draw.text(
+                ((width + x) // 2 - 40, content_start_y+15), 
+                "MINECRAFT", 
+                fill=(240, 240, 240))
+        
+        else:
+            # Standard window content - placeholder
+            # Sidebar
+            draw.rectangle(
+                (x+5, y+title_height+5, x+80, height-5),
+                fill=(245, 245, 250))
+                
+            # Content area with grid pattern
+            for i in range(0, 3):
+                for j in range(0, 4):
+                    draw.rounded_rectangle(
+                        (x+90 + j*90, y+title_height+10 + i*50, 
+                         x+170 + j*90, y+title_height+50 + i*50),
+                        radius=2,
+                        fill=(250, 250, 255),
+                        outline=(220, 225, 235))
+    
     def start_ambient_animation(self):
-        """Start refined ambient animation effects"""
+        """Start sophisticated ambient animation effects for premium look and feel"""
+        # Animation variables for smooth transitions
+        self.animation_values = {
+            "pulse_phase": 0,           # For connection indicator
+            "activity_phase": 0,        # For activity meter
+            "activity_width": 80,       # Base activity width
+            "activity_target": 120,     # Target width
+            "highlight_alpha": 0,       # For highlight effects
+            "highlight_dir": 1,         # Direction of highlight change
+            "notification_alpha": 0,    # For notification effects
+            "notification_dir": 1,      # Direction of alpha change
+            "scan_line_pos": 0,         # Position for scan line effect
+            "meter_dots_opacity": 50,   # Opacity for activity dots
+            "particle_positions": []    # For particle effect
+        }
+        
+        # Initialize particle effects
+        self.init_particles()
+        
         def update_animation():
-            # More subtle pulse effect for connection indicator
-            pulse_size = 1.5 * math.sin(time.time() * 2) + 1.5  # Less dramatic
+            # Update animation phases
+            self.animation_values["pulse_phase"] = (self.animation_values["pulse_phase"] + 0.04) % (2 * math.pi)
+            self.animation_values["activity_phase"] = (self.animation_values["activity_phase"] + 0.03) % (2 * math.pi)
+            self.animation_values["scan_line_pos"] = (self.animation_values["scan_line_pos"] + 1) % self.screen_height
+            
+            # More sophisticated pulse effect for connection indicator using dual sine waves
+            pulse_size = 1.8 * math.sin(self.animation_values["pulse_phase"]) + 0.5 * math.sin(self.animation_values["pulse_phase"] * 2.3) + 1.0
             self.header_canvas.coords(
                 self.connection_indicator,
                 1050 - pulse_size, 35 - pulse_size, 
                 1070 + pulse_size, 55 + pulse_size)
             
-            # More subtle activity meter animation
-            activity_width = 80 + 20 * math.sin(time.time() * 0.7)  # Slower, less extreme
+            # Advanced activity meter animation with easing
+            # Calculate target based on time
+            if random.random() < 0.01:  # Occasionally change the target
+                self.animation_values["activity_target"] = random.randint(60, 160)
+                
+            # Smooth transition to target
+            current = self.animation_values["activity_width"]
+            target = self.animation_values["activity_target"]
+            self.animation_values["activity_width"] += (target - current) * 0.05
+            
+            # Apply sine wave motion for more organic movement
+            activity_width = self.animation_values["activity_width"] + 5 * math.sin(self.animation_values["activity_phase"])
+            
+            # Update meter position
             self.screen_canvas.coords(
                 self.activity_meter,
-                self.screen_width - 200, self.screen_height - 38,
-                self.screen_width - 200 + activity_width, self.screen_height - 22)
+                self.screen_width - 205, self.screen_height - 40,
+                self.screen_width - 205 + activity_width, self.screen_height - 20)
+                
+            # Update highlight position to match
+            self.screen_canvas.coords(
+                self.activity_highlight,
+                self.screen_width - 205, self.screen_height - 40,
+                self.screen_width - 205 + activity_width, self.screen_height - 30)
+            
+            # Animate activity dots with pulsing effect
+            dot_positions = [
+                (self.screen_width - 185, "#DC2626", 0),      # Red
+                (self.screen_width - 165, "#2563EB", 2.1),    # Blue with phase shift
+                (self.screen_width - 145, "#0EA5E9", 4.2)     # Cyan with phase shift
+            ]
+            
+            # Update dot opacities
+            self.animation_values["meter_dots_opacity"] = 30 + int(20 * math.sin(self.animation_values["pulse_phase"]))
+            
+            for i, (x_pos, color, phase_shift) in enumerate(dot_positions):
+                # Calculate individual pulse for each dot
+                dot_pulse = math.sin(self.animation_values["pulse_phase"] + phase_shift) * 0.5 + 0.5
+                
+                # Pulse size based on activity level
+                if i == 0:  # Red dot shows warning based on activity
+                    dot_size = 2.5 + 1.5 * dot_pulse if activity_width > 120 else 2
+                elif i == 1:  # Blue dot pulses on medium activity
+                    dot_size = 2.5 + 1.5 * dot_pulse if 80 < activity_width <= 120 else 2
+                else:  # Cyan dot pulses on low activity
+                    dot_size = 2.5 + 1.5 * dot_pulse if activity_width <= 80 else 2
+                
+                # Update scan line effect - subtle line that passes over the screen
+                if self.animation_values["scan_line_pos"] % 200 < 30:
+                    scan_y = self.animation_values["scan_line_pos"] % 200
+                    scan_alpha = int(150 - scan_y * 5)
+                    if scan_alpha > 0:
+                        # Create temporary scan line - use regular RGB without alpha
+                        scan_line = self.screen_canvas.create_line(
+                            self.screen_area[0], self.screen_area[1] + scan_y,
+                            self.screen_area[2], self.screen_area[1] + scan_y,
+                            fill=f"#{100:02x}{160:02x}{255:02x}",  # Removed alpha channel
+                            width=1,
+                            stipple="gray" + str(min(75, scan_alpha // 2)))  # Use stipple for transparency
+                        # Schedule deletion
+                        self.root.after(30, lambda line=scan_line: self.screen_canvas.delete(line))
+            
+            # Update particle effects
+            self.update_particles()
             
             # Schedule next update
-            self.root.after(50, update_animation)
+            self.root.after(30, update_animation)
         
         # Start animation
         update_animation()
+    
+    def init_particles(self):
+        """Initialize particle effect for premium animation"""
+        # Create particles for background animation
+        for _ in range(20):
+            x = random.randint(10, self.screen_width - 10)
+            y = random.randint(10, self.screen_height - 10)
+            size = random.uniform(1.0, 3.0)
+            speed = random.uniform(0.2, 1.0)
+            color = random.choice([
+                self.accent_primary, 
+                self.accent_tertiary,
+                "#ffffff"
+            ])
+            alpha = random.randint(20, 80)
+            
+            self.animation_values["particle_positions"].append({
+                "x": x, "y": y, "size": size, "speed": speed, 
+                "color": color, "alpha": alpha,
+                "id": None  # Will hold canvas item id
+            })
+    
+    def update_particles(self):
+        """Update particle effects for ambient animation"""
+        # Clean up existing particles
+        for particle in self.animation_values["particle_positions"]:
+            if particle["id"] is not None:
+                self.screen_canvas.delete(particle["id"])
+        
+        # Update and redraw particles
+        for particle in self.animation_values["particle_positions"]:
+            # Move particle upward with slight wobble
+            particle["y"] -= particle["speed"]
+            particle["x"] += math.sin(particle["y"] * 0.05) * 0.3
+            
+            # Reset if it goes out of bounds
+            if particle["y"] < 0:
+                particle["y"] = self.screen_height + 5
+                particle["x"] = random.randint(0, self.screen_width)
+            
+            # Draw particle with fading effect
+            # Calculate opacity based on position (fade near edges)
+            edge_distance = min(
+                particle["x"], self.screen_width - particle["x"],
+                particle["y"], self.screen_height - particle["y"]
+            )
+            fade_factor = min(1.0, edge_distance / 50.0)
+            opacity = int(particle["alpha"] * fade_factor)
+            
+            if opacity > 0:
+                # Extract RGB components from hex color
+                color = particle["color"]
+                if color.startswith('#'):
+                    r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
+                else:
+                    r, g, b = 255, 255, 255
+                
+                # Create particle with glow effect - use stipple for transparency
+                glow_size = particle["size"] * 2
+                
+                # Calculate stipple pattern based on opacity
+                glow_stipple = "gray" + str(min(75, opacity // 4))
+                particle_stipple = "gray" + str(min(75, opacity // 2))
+                
+                # Outer glow
+                particle["id"] = self.screen_canvas.create_oval(
+                    particle["x"] - glow_size, particle["y"] - glow_size,
+                    particle["x"] + glow_size, particle["y"] + glow_size,
+                    fill=f"#{r:02x}{g:02x}{b:02x}", 
+                    stipple=glow_stipple,
+                    outline="")
+                
+                # Inner particle
+                self.screen_canvas.create_oval(
+                    particle["x"] - particle["size"], 
+                    particle["y"] - particle["size"],
+                    particle["x"] + particle["size"], 
+                    particle["y"] + particle["size"],
+                    fill=f"#{r:02x}{g:02x}{b:02x}", 
+                    stipple=particle_stipple,
+                    outline="")
     
     def update_status(self, status_text, color="red"):
         """Update connection status indicator"""
@@ -934,56 +1578,111 @@ class FuturisticParentMonitorApp:
         self.header_canvas.itemconfig(self.connection_indicator, fill=fill_color)
     
     def update_apps_list(self):
-        """Update applications list with current windows"""
+        """Update applications list with modern premium cards"""
         # Clear existing app cards
         for widget in self.apps_container.winfo_children():
             widget.destroy()
         
-        # Create cards for each app - more professional cards
+        # Create cards for each app - premium design
         for i, window in enumerate(self.windows_list):
-            # Create app card with subtle border
-            card = tk.Frame(self.apps_container, bg=self.panel_bg, bd=1, 
-                          relief="solid", highlightbackground="#3A5175", highlightthickness=1)
-            card.pack(fill=tk.X, pady=4, padx=2)  # Better spacing
+            # Create premium app card with glass effect
+            card = tk.Frame(self.apps_container, bg=self.panel_bg, bd=0, 
+                          highlightbackground=self.highlight_color, highlightthickness=1)
+            card.pack(fill=tk.X, pady=6, padx=4)  # Better spacing
             
-            # Add circular icon
-            icon_canvas = tk.Canvas(card, width=36, height=36,  # Smaller icon
+            # Add drop shadow effect
+            shadow_frame = tk.Frame(card, bg=self.panel_bg, height=3)
+            shadow_frame.pack(side=tk.BOTTOM, fill=tk.X)
+            
+            # Add inner frame with glass effect
+            inner_frame = tk.Frame(card, bg=self.panel_bg, padx=4, pady=4)
+            inner_frame.pack(fill=tk.BOTH, expand=True)
+            
+            # Add circular icon with premium styling
+            icon_size = 40  # Slightly larger for premium look
+            icon_canvas = tk.Canvas(inner_frame, width=icon_size, height=icon_size,
                                    bg=self.panel_bg, highlightthickness=0)
-            icon_canvas.pack(side=tk.LEFT, padx=8)  # Better spacing
+            icon_canvas.pack(side=tk.LEFT, padx=8, pady=4)  # Better spacing
             
-            # Determine icon color based on app type - more professional colors
+            # Determine icon color based on app type - premium brand colors
             if "chrome" in window["process"].lower():
                 icon_color = "#4285F4"  # Google blue
+                accent_color = "#EA4335"  # Google red
+                icon_letter = "C"
             elif "java" in window["process"].lower():
-                icon_color = "#27AE60"  # Professional green
+                icon_color = "#007396"  # Java blue
+                accent_color = "#ED8B00"  # Java orange 
+                icon_letter = "J"
             elif "discord" in window["process"].lower():
                 icon_color = "#5865F2"  # Discord brand color
+                accent_color = "#EB459E"  # Discord secondary
+                icon_letter = "D"
+            elif "minecraft" in window["title"].lower():
+                icon_color = "#62B47A"  # Minecraft green
+                accent_color = "#986C3C"  # Minecraft brown
+                icon_letter = "M"
+            elif "explorer" in window["process"].lower():
+                icon_color = "#0078D7"  # Explorer blue
+                accent_color = "#107C10"  # Windows green
+                icon_letter = "E"
+            elif "notepad" in window["process"].lower():
+                icon_color = "#FFB900"  # Yellow
+                accent_color = "#00B4F0"  # Cyan
+                icon_letter = "N"
             else:
                 icon_color = self.accent_primary
+                accent_color = self.accent_tertiary
+                icon_letter = window["process"][0].upper()
             
-            # Draw icon - smaller, more refined
-            icon_canvas.create_oval(4, 4, 32, 32, fill=icon_color, outline="")
+            # Draw premium icon with gradient effect and glow
+            # Outer circle for glow
+            icon_canvas.create_oval(0, 0, icon_size, icon_size, 
+                                   fill="", outline=accent_color, width=1)
+            
+            # Main circle
+            icon_canvas.create_oval(4, 4, icon_size-4, icon_size-4, 
+                                   fill=icon_color, outline="")
+            
+            # Add app initial for better identification
+            icon_canvas.create_text(icon_size//2, icon_size//2, 
+                                   text=icon_letter, 
+                                   fill="white", 
+                                   font=self.subtitle_font)
+            
+            # Inner highlight for 3D effect
+            icon_canvas.create_arc(8, 8, icon_size-8, icon_size-8, 
+                                  start=45, extent=180, 
+                                  outline="white", style="arc", width=1)
             
             # Add app info with better spacing
-            info_frame = tk.Frame(card, bg=self.panel_bg)
-            info_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=6)
+            info_frame = tk.Frame(inner_frame, bg=self.panel_bg)
+            info_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=8)
             
-            # App title - better font
+            # App title - better font and styling
             title_label = tk.Label(info_frame, text=window["title"],
                                  font=self.normal_font, bg=self.panel_bg,
-                                 fg=self.text_color, anchor="w", justify=tk.LEFT)
-            title_label.pack(fill=tk.X, anchor="w", pady=(3, 0))  # Better spacing
+                                 fg=self.text_color, anchor="w", justify=tk.LEFT,
+                                 padx=2, pady=2)
+            title_label.pack(fill=tk.X, anchor="w", pady=(4, 1))
             
-            # Process name - more subdued
-            process_label = tk.Label(info_frame, text=window["process"],
+            # Process name - more refined styling
+            process_frame = tk.Frame(info_frame, bg=self.panel_bg)
+            process_frame.pack(fill=tk.X, anchor="w", pady=(0, 2))
+            
+            process_indicator = tk.Canvas(process_frame, width=6, height=6, 
+                                        bg=self.panel_bg, highlightthickness=0)
+            process_indicator.pack(side=tk.LEFT, padx=(0, 4), pady=2)
+            process_indicator.create_oval(0, 0, 6, 6, fill=accent_color, outline="")
+            
+            process_label = tk.Label(process_frame, text=window["process"],
                                   font=self.small_font, bg=self.panel_bg,
                                   fg=self.secondary_text, anchor="w", justify=tk.LEFT)
-            process_label.pack(fill=tk.X, anchor="w")
+            process_label.pack(side=tk.LEFT, fill=tk.X)
             
-            # View button - more professional
-            view_button = ttk.Button(card, text="View", style="Accent.TButton",
+            # View button with modern styling
+            view_button = ttk.Button(inner_frame, text="View", style="Accent.TButton",
                                    command=lambda wid=window["id"]: self.view_application(wid))
-            view_button.pack(side=tk.RIGHT, padx=8, pady=4)  # Better spacing
+            view_button.pack(side=tk.RIGHT, padx=8, pady=6)
     
     def update_history_list(self):
         """Update browser history list"""

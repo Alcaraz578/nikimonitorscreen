@@ -1,3 +1,20 @@
+def create_rounded_rectangle(canvas, x1, y1, x2, y2, radius=25, **kwargs):
+    """Create a rounded rectangle on a canvas with single radius value"""
+    points = [
+        x1 + radius, y1,
+        x2 - radius, y1,
+        x2, y1,
+        x2, y1 + radius,
+        x2, y2 - radius,
+        x2, y2,
+        x2 - radius, y2,
+        x1 + radius, y2,
+        x1, y2,
+        x1, y2 - radius,
+        x1, y1 + radius,
+        x1, y1
+    ]
+    return canvas.create_polygon(points, smooth=True, **kwargs)
 import socket
 import pickle
 import tkinter as tk
@@ -393,9 +410,9 @@ class FuturisticParentMonitorApp:
         
         # Bottom status bar - more professional
         draw.rounded_rectangle(
-            (0, self.screen_height - 60, self.screen_width, self.screen_height),
-            radius=(0, 0, 10, 10),  # Only round bottom corners, smaller radius
-            fill=(30, 40, 70, 180))
+    (0, self.screen_height - 60, self.screen_width, self.screen_height),
+    radius=10,  # Use single value for radius
+    fill=(30, 40, 70, 180))
         
         # Main screen area - cleaner look
         self.screen_area = (20, 80, self.screen_width - 20, self.screen_height - 70)
@@ -469,13 +486,13 @@ class FuturisticParentMonitorApp:
         # Tab bar
         draw.rounded_rectangle(
             (0, 0, apps_width, 50),
-            radius=(10, 10, 0, 0),  # Only round top corners
+            radius=10,  # Changed from (10, 10, 0, 0) to single value
             fill=(25, 35, 60, 220))  # Darker, more professional
         
         # Active tab
         draw.rounded_rectangle(
             (0, 0, apps_width // 2, 50),
-            radius=(10, 10, 0, 0),  # Only round top corners
+            radius=10,  # Changed from (10, 10, 0, 0) to single value
             fill=(58, 123, 219, 230))  # Professional blue
         
         # Apply slight blur for a modern look
@@ -612,7 +629,7 @@ class FuturisticParentMonitorApp:
         # Header bar - more professional
         analytics_header = self.apps_canvas.create_rounded_rectangle(
             0, 560, self.apps_panel_width, 600,
-            radius=(8, 8, 0, 0), fill=self.accent_secondary)
+            radius=8, fill=self.accent_secondary)  # Changed from (8, 8, 0, 0) to single value
         
         # Title
         self.apps_canvas.create_text(
@@ -835,7 +852,7 @@ class FuturisticParentMonitorApp:
         # Another window - more professional
         draw.rounded_rectangle((200, 150, 500, 350), radius=6,  # Smaller radius
                               fill=(240, 245, 250))  # Slightly off-white
-        draw.rounded_rectangle((200, 150, 500, 180), radius=(6, 6, 0, 0),  # Only round top corners
+        draw.rounded_rectangle((200, 150, 500, 180), radius=6,  # Changed from (6, 6, 0, 0) to single value
                               fill=(220, 225, 235))  # Subtle title bar
         draw.text((210, 160), "Google Chrome", fill=(60, 60, 80))  # Darker text
         
@@ -1267,21 +1284,7 @@ class FuturisticParentMonitorApp:
                 print(f"Error updating screenshot: {e}")
 
 # Add custom shape function to Canvas class
-tk.Canvas.create_rounded_rectangle = lambda self, x1, y1, x2, y2, radius=25, **kwargs: self.create_polygon(
-    x1+radius, y1,
-    x2-radius, y1,
-    x2, y1,
-    x2, y1+radius,
-    x2, y2-radius,
-    x2, y2,
-    x2-radius, y2,
-    x1+radius, y2,
-    x1, y2,
-    x1, y2-radius,
-    x1, y1+radius,
-    x1, y1,
-    smooth=True, **kwargs)
-
+tk.Canvas.create_rounded_rectangle = create_rounded_rectangles
 if __name__ == "__main__":
     root = tk.Tk()
     app = FuturisticParentMonitorApp(root)

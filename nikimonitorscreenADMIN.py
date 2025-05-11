@@ -1256,12 +1256,12 @@ class FuturisticParentMonitorApp:
         draw.rounded_rectangle(
             (x, y, width, y+title_height),
             radius=8,
-            fill=color)
+            fill=self._ensure_rgb_color(color))
         
         # Make sure bottom corners of title bar aren't rounded
         draw.rectangle(
             (x, y+title_height-8, width, y+title_height),
-            fill=color)
+            fill=self._ensure_rgb_color(color))
         
         # Window title
         text_color = (255, 255, 255)
@@ -1378,6 +1378,15 @@ class FuturisticParentMonitorApp:
                         fill=(250, 250, 255),
                         outline=(220, 225, 235))
     
+    def _ensure_rgb_color(self, color):
+        """Convert hex color to RGB tuple if needed"""
+        if isinstance(color, str) and color.startswith('#'):
+            r = int(color[1:3], 16)
+            g = int(color[3:5], 16)
+            b = int(color[5:7], 16)
+            return (r, g, b)
+        return color
+    
     def start_ambient_animation(self):
         """Start sophisticated ambient animation effects for premium look and feel"""
         # Animation variables for smooth transitions
@@ -1469,7 +1478,7 @@ class FuturisticParentMonitorApp:
                             self.screen_area[2], self.screen_area[1] + scan_y,
                             fill=f"#{100:02x}{160:02x}{255:02x}",  # Removed alpha channel
                             width=1,
-                            stipple="gray" + str(min(75, scan_alpha // 2)))  # Use stipple for transparency
+                            stipple=self._get_stipple_pattern(scan_alpha))  # Use stipple for transparency
                         # Schedule deletion
                         self.root.after(30, lambda line=scan_line: self.screen_canvas.delete(line))
             
@@ -1542,8 +1551,8 @@ class FuturisticParentMonitorApp:
                 glow_size = particle["size"] * 2
                 
                 # Calculate stipple pattern based on opacity
-                glow_stipple = "gray" + str(min(75, opacity // 4))
-                particle_stipple = "gray" + str(min(75, opacity // 2))
+                glow_stipple = self._get_stipple_pattern(opacity // 4)
+                particle_stipple = self._get_stipple_pattern(opacity // 2)
                 
                 # Outer glow
                 particle["id"] = self.screen_canvas.create_oval(
@@ -1562,6 +1571,19 @@ class FuturisticParentMonitorApp:
                     fill=f"#{r:02x}{g:02x}{b:02x}", 
                     stipple=particle_stipple,
                     outline="")
+    
+    def _get_stipple_pattern(self, opacity):
+        """Return appropriate stipple pattern based on opacity"""
+        if opacity < 20:
+            return "gray12"
+        elif opacity < 40:
+            return "gray25"
+        elif opacity < 60:
+            return "gray50"
+        elif opacity < 80:
+            return "gray75"
+        else:
+            return ""  # No stipple (solid)
     
     def update_status(self, status_text, color="red"):
         """Update connection status indicator"""

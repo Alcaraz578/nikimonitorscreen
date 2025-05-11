@@ -14,6 +14,17 @@ def create_rounded_rectangle(canvas, x1, y1, x2, y2, radius=25, **kwargs):
         x1, y1 + radius,
         x1, y1
     ]
+    
+    # Convert fill color if it's a tuple (for compatibility between PIL and tkinter)
+    if 'fill' in kwargs and isinstance(kwargs['fill'], tuple):
+        r, g, b = kwargs['fill'][:3]
+        kwargs['fill'] = f'#{r:02x}{g:02x}{b:02x}'
+    
+    # Convert outline color if it's a tuple
+    if 'outline' in kwargs and isinstance(kwargs['outline'], tuple):
+        r, g, b = kwargs['outline'][:3]
+        kwargs['outline'] = f'#{r:02x}{g:02x}{b:02x}'
+        
     return canvas.create_polygon(points, smooth=True, **kwargs)
 import socket
 import pickle
@@ -410,9 +421,9 @@ class FuturisticParentMonitorApp:
         
         # Bottom status bar - more professional
         draw.rounded_rectangle(
-    (0, self.screen_height - 60, self.screen_width, self.screen_height),
-    radius=10,  # Use single value for radius
-    fill=(30, 40, 70, 180))
+            (0, self.screen_height - 60, self.screen_width, self.screen_height),
+            radius=10,  # Use single value for radius
+            fill=(30, 40, 70, 180))
         
         # Main screen area - cleaner look
         self.screen_area = (20, 80, self.screen_width - 20, self.screen_height - 70)
@@ -664,7 +675,6 @@ class FuturisticParentMonitorApp:
         # Draw points - more professional
         for x, y in points:
             # Regular points - smaller for professional look
-            self.apps_canvas.create_oval# Regular points - smaller for professional look
             self.apps_canvas.create_oval(
                 x - 2, y - 2, x + 2, y + 2,  # Smaller points
                 fill=self.accent_tertiary, outline="")
@@ -1284,7 +1294,7 @@ class FuturisticParentMonitorApp:
                 print(f"Error updating screenshot: {e}")
 
 # Add custom shape function to Canvas class
-tk.Canvas.create_rounded_rectangle = create_rounded_rectangles
+tk.Canvas.create_rounded_rectangle = create_rounded_rectangle
 if __name__ == "__main__":
     root = tk.Tk()
     app = FuturisticParentMonitorApp(root)

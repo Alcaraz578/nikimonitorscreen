@@ -54,7 +54,7 @@ class GuardianClientMonitor:
         self.freeze_photo = None
         
         # Stream settings
-        self.stream_fps = 15            # Target frames per second for screen streaming
+        self.stream_fps = 20           # Target frames per second for screen streaming
         self.stream_quality = 50        # JPEG quality (1-100)
         self.stream_scale = 0.7         # Scale factor to reduce bandwidth
         self.streaming = False          # Flag to control streaming

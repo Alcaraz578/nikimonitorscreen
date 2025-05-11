@@ -1123,110 +1123,188 @@ class FuturisticParentMonitorApp:
         self.update_status("Ready to connect", "orange")
     
     def create_sample_screen(self):
-        """Create a high-quality professional sample screen image"""
+        """Create an ultra-premium professional sample screen image"""
         # Create a sample screen image
         width = int(self.screen_area[2] - self.screen_area[0])
         height = int(self.screen_area[3] - self.screen_area[1])
         
-        # Create premium desktop background
-        screen_img = Image.new('RGB', (width, height), (15, 25, 45))  # Darker background
+        # Create premium desktop background with sophisticated gradient
+        screen_img = Image.new('RGB', (width, height), (15, 25, 45))
         draw = ImageDraw.Draw(screen_img)
         
-        # Draw modern desktop background with subtle grid
-        # First draw gradient background
+        # Create luxury gradient background with depth
         for y in range(height):
-            # Vertical gradient for more depth
-            r = int(15 + (25 - 15) * y / height)
-            g = int(25 + (35 - 25) * y / height)
-            b = int(45 + (60 - 45) * y / height)
+            # Vertical gradient for premium depth
+            progress = y / height
             
+            # Multi-stop gradient for ultra-premium look
+            if progress < 0.3:
+                r = int(15 + (18 - 15) * progress / 0.3)
+                g = int(25 + (30 - 25) * progress / 0.3)
+                b = int(45 + (55 - 45) * progress / 0.3)
+            elif progress < 0.7:
+                r = int(18 + (20 - 18) * (progress - 0.3) / 0.4)
+                g = int(30 + (35 - 30) * (progress - 0.3) / 0.4)
+                b = int(55 + (65 - 55) * (progress - 0.3) / 0.4)
+            else:
+                r = int(20 + (22 - 20) * (progress - 0.7) / 0.3)
+                g = int(35 + (38 - 35) * (progress - 0.7) / 0.3)
+                b = int(65 + (70 - 65) * (progress - 0.7) / 0.3)
+                
             draw.line([(0, y), (width, y)], fill=(r, g, b))
         
-        # Add refined grid pattern
-        for i in range(0, width, 50):
-            for j in range(0, height, 50):
-                # Create subtle grid squares
-                alpha = random.randint(5, 15)  # Very subtle
-                draw.rectangle(
-                    (i, j, i+48, j+48), 
-                    fill=(30, 40, 70, alpha),
-                    outline=(40, 60, 100, alpha))
+        # Add ultra-premium subtle grid
+        for i in range(0, width, 40):
+            # Vertical grid lines
+            line_color = (30, 45, 80, 20)  # Very subtle
+            for y in range(0, height, 4):  # Dotted line effect
+                if y % 8 == 0:
+                    draw.point((i, y), fill=line_color)
         
-        # Add subtle particles for modern look
-        for _ in range(100):
-            x = random.randint(0, width - 1)
-            y = random.randint(0, height - 1)
-            size = random.randint(1, 3)
-            alpha = random.randint(20, 60)
-            draw.ellipse(
-                (x, y, x+size, y+size), 
-                fill=(200, 220, 255, alpha))
+        for j in range(0, height, 40):
+            # Horizontal grid lines
+            for x in range(0, width, 4):  # Dotted line effect
+                if x % 8 == 0:
+                    draw.point((x, j), fill=line_color)
         
-        # Draw premium looking windows - Minecraft window
-        self.draw_premium_window(
-            draw, 50, 50, 450, 300, 
-            "Minecraft 1.19", "#62B47A", 
+        # Add premium vignette effect for depth
+        for i in range(40):
+            alpha = int(i * 1.5)
+            # Draw concentric rectangles with increasing darkness
+            draw.rectangle(
+                (i, i, width-i, height-i), 
+                fill=None, 
+                outline=(0, 0, 0, alpha))
+        
+        # Create translucent overlay for windows area
+        overlay = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+        overlay_draw = ImageDraw.Draw(overlay)
+        
+        # Draw premium looking windows with sophisticated content
+        
+        # Main app window - Minecraft with premium styling
+        main_window = self.draw_premium_window(
+            overlay_draw, 40, 40, 550, 350, 
+            "Minecraft 1.19 Premium Edition", "#62B47A", 
             game_window=True)
         
-        # Chrome window with search
-        self.draw_premium_window(
-            draw, 200, 150, 550, 400, 
-            "Google Chrome - Homework Research", "#4285F4",
+        # Add reflection effect to main window
+        for i in range(30):
+            alpha = int(150 - i * 5)
+            if alpha > 0:
+                # Draw highlight line with decreasing opacity
+                overlay_draw.line(
+                    (40 + i, 40 + i, 550 - i, 40 + i),
+                    fill=(255, 255, 255, alpha))
+        
+        # Browser window with modern design
+        browser_window = self.draw_premium_window(
+            overlay_draw, 170, 120, 650, 420, 
+            "Google Chrome - Educational Research", "#4285F4",
             browser=True, url="www.khanacademy.org/math/geometry")
         
-        # File explorer window
-        self.draw_premium_window(
-            draw, 400, 80, 700, 250, 
-            "File Explorer - Documents", "#0078D7")
-            
-        # Modern taskbar
+        # Productivity app window - more professional look
+        docs_window = self.draw_premium_window(
+            overlay_draw, 390, 60, 740, 280, 
+            "Research Notes - Document", "#0D6EFD", 
+            doc_window=True)
+        
+        # Add ultra-modern taskbar with glass effect
         taskbar_height = 40
-        # Taskbar background with glass effect
-        draw.rectangle(
+        overlay_draw.rectangle(
             (0, height-taskbar_height, width, height),
-            fill=(20, 30, 50))
+            fill=(10, 20, 35, 220))
             
         # Add glass highlight
-        draw.rectangle(
-            (0, height-taskbar_height, width, height-taskbar_height+1),
-            fill=(60, 80, 120))
+        overlay_draw.line(
+            (0, height-taskbar_height, width, height-taskbar_height),
+            fill=(100, 150, 255, 40), width=1)
         
-        # Start button
+        # Add start button with premium look
         start_width = 45
-        draw.rounded_rectangle(
+        overlay_draw.rounded_rectangle(
             (10, height-taskbar_height+5, 10+start_width, height-5),
             radius=4,
             fill=(37, 99, 235))
             
-        # Taskbar icons
-        icon_size = 26
-        icon_y = height - taskbar_height//2 - icon_size//2
-        
-        # Windows icon
-        draw.rectangle(
-            (15, icon_y+10, 15+start_width-10, icon_y+16),
+        # Windows logo
+        overlay_draw.rectangle(
+            (15, height-taskbar_height+15, 25, height-taskbar_height+25),
+            fill=(255, 255, 255))
+        overlay_draw.rectangle(
+            (27, height-taskbar_height+15, 37, height-taskbar_height+25),
+            fill=(255, 255, 255))
+        overlay_draw.rectangle(
+            (15, height-taskbar_height+27, 25, height-taskbar_height+37),
+            fill=(255, 255, 255))
+        overlay_draw.rectangle(
+            (27, height-taskbar_height+27, 37, height-taskbar_height+37),
             fill=(255, 255, 255))
             
-        # App icons
+        # Taskbar app icons with premium styling
         icons = [
-            {"color": "#4285F4", "pos": 70},  # Chrome
-            {"color": "#62B47A", "pos": 120},  # Minecraft
-            {"color": "#0078D7", "pos": 170},  # Explorer
-            {"color": "#5865F2", "pos": 220},  # Discord
+            {"color": "#4285F4", "pos": 70, "letter": "C"},   # Chrome
+            {"color": "#62B47A", "pos": 120, "letter": "M"},  # Minecraft
+            {"color": "#0D6EFD", "pos": 170, "letter": "D"},  # Documents
+            {"color": "#5865F2", "pos": 220, "letter": "D"},  # Discord
+            {"color": "#EA4335", "pos": 270, "letter": "G"},  # Gmail
         ]
         
+        icon_size = 30
+        icon_y = height - taskbar_height + (taskbar_height - icon_size) // 2
+        
         for icon in icons:
-            draw.rounded_rectangle(
+            # Base shape
+            overlay_draw.rounded_rectangle(
                 (icon["pos"], icon_y, icon["pos"]+icon_size, icon_y+icon_size),
-                radius=4,
+                radius=6,
+                fill=icon["color"])
+                
+            # Add highlight for 3D effect
+            overlay_draw.line(
+                (icon["pos"]+3, icon_y+3, icon["pos"]+icon_size-3, icon_y+3),
+                fill=(255, 255, 255, 100))
+                
+            # Add icon letter
+            text_x = icon["pos"] + icon_size//2
+            text_y = icon_y + icon_size//2
+            overlay_draw.text(
+                (text_x, text_y),
+                icon["letter"],
+                fill=(255, 255, 255),
+                anchor="mm")
+        
+        # Add clock with premium styling
+        current_time = datetime.now().strftime("%H:%M")
+        
+        # Clock background
+        overlay_draw.rounded_rectangle(
+            (width-80, icon_y, width-15, icon_y+icon_size),
+            radius=4,
+            fill=(30, 40, 70, 180))
+            
+        # Clock text
+        overlay_draw.text(
+            (width-48, icon_y+icon_size//2),
+            current_time,
+            fill=(240, 240, 240),
+            anchor="mm")
+            
+        # Add system tray icons
+        tray_icons = [
+            {"pos": width-100, "color": (240, 240, 240)},  # WiFi
+            {"pos": width-130, "color": (240, 240, 240)},  # Volume
+            {"pos": width-160, "color": (240, 240, 240)},  # Battery
+        ]
+        
+        for icon in tray_icons:
+            # Simple dot for system tray icons
+            overlay_draw.ellipse(
+                (icon["pos"], icon_y+12, icon["pos"]+6, icon_y+18),
                 fill=icon["color"])
         
-        # Clock
-        current_time = datetime.now().strftime("%H:%M")
-        draw.text(
-            (width-70, height-taskbar_height+13), 
-            current_time, 
-            fill=(240, 240, 240))
+        # Compose the image
+        screen_img = Image.alpha_composite(screen_img.convert('RGBA'), overlay)
         
         # Convert to PhotoImage
         self.screen_photo = ImageTk.PhotoImage(screen_img)
@@ -1237,37 +1315,59 @@ class FuturisticParentMonitorApp:
             image=self.screen_photo, anchor="nw")
         
         # Update current view label
-        self.view_label_text = "Current View: Minecraft 1.19"
+        self.view_label_text = "Current View: Minecraft 1.19 Premium Edition"
         self.screen_canvas.itemconfig(self.view_label, text=self.view_label_text)
         
         # Update active window
         self.active_window_id = 1
     
-    def draw_premium_window(self, draw, x, y, width, height, title, color, browser=False, game_window=False, url=None):
-        """Draw a premium looking window for the sample screen"""
-        # Window border with rounded corners
+    def draw_premium_window(self, draw, x, y, width, height, title, color, 
+                            browser=False, game_window=False, doc_window=False, url=None):
+        """Draw an ultra-premium looking window for the sample screen"""
+        # Window border with subtle shadow
+        shadow_color = (0, 0, 0, 30)
+        
+        # Draw shadow first for depth
+        for i in range(5):
+            alpha = 30 - i * 5
+            if alpha > 0:
+                draw.rounded_rectangle(
+                    (x+i, y+i, width+i, height+i),
+                    radius=10,
+                    fill=None,
+                    outline=(0, 0, 0, alpha))
+        
+        # Main window background - ultra-premium white
         draw.rounded_rectangle(
             (x, y, width, height),
             radius=8,
-            fill=(240, 245, 250))
+            fill=(245, 248, 250, 250))
         
-        # Window title bar
+        # Window title bar with premium gradient
         title_height = 30
+        
+        # Create gradient manually for ultra-premium look
+        rgb_color = self._ensure_rgb_color(color)
+        
+        # Draw title bar
         draw.rounded_rectangle(
             (x, y, width, y+title_height),
             radius=8,
-            fill=self._ensure_rgb_color(color))
+            fill=rgb_color)
         
         # Make sure bottom corners of title bar aren't rounded
         draw.rectangle(
             (x, y+title_height-8, width, y+title_height),
-            fill=self._ensure_rgb_color(color))
+            fill=rgb_color)
         
-        # Window title
+        # Window title with shadow for depth
         text_color = (255, 255, 255)
+        # Text shadow
+        draw.text((x+11, y+9), title, fill=(0, 0, 0, 100))
+        # Text
         draw.text((x+10, y+8), title, fill=text_color)
         
-        # Window controls
+        # Window controls with premium style
         controls = [
             {"color": (255, 75, 75), "offset": 20},    # Close
             {"color": (255, 205, 65), "offset": 40},   # Minimize
@@ -1275,108 +1375,356 @@ class FuturisticParentMonitorApp:
         ]
         
         for control in controls:
+            # Create control button with shadow for depth
+            draw.ellipse(
+                (width-control["offset"]-1, y+9, 
+                 width-control["offset"]+13, y+23),
+                fill=(0, 0, 0, 30))
+                
             draw.ellipse(
                 (width-control["offset"], y+8, 
                  width-control["offset"]+14, y+22),
                 fill=control["color"])
+                
+            # Add highlight for 3D effect
+            draw.arc(
+                (width-control["offset"]+3, y+11, 
+                 width-control["offset"]+11, y+19),
+                start=0, end=180,
+                fill=(255, 255, 255, 150))
         
         # Window content based on type
         if browser:
-            # Address bar
-            draw.rectangle(
-                (x+10, y+title_height+10, width-10, y+title_height+40),
-                fill=(230, 235, 240),
-                outline=(200, 210, 220))
-                
-            # URL
-            if url:
-                draw.text(
-                    (x+20, y+title_height+18), 
-                    url, 
-                    fill=(70, 90, 120))
-            
-            # Browser content - placeholder
-            # Tab bar
-            draw.rectangle(
-                (x+5, y+title_height, width-5, y+title_height+10),
-                fill=(220, 225, 230))
-                
-            # Content area with academic website mockup
-            content_start_y = y+title_height+45
-            
-            # Header area
-            draw.rectangle(
-                (x+10, content_start_y, width-10, content_start_y+40),
-                fill=(60, 90, 160))
-                
-            draw.text(
-                (x+30, content_start_y+15), 
-                "Khan Academy - Mathematics", 
-                fill=(255, 255, 255))
-            
-            # Content columns
-            draw.rectangle(
-                (x+20, content_start_y+50, x+160, content_start_y+90),
-                fill=(240, 240, 240))
-                
-            draw.rectangle(
-                (x+20, content_start_y+100, x+160, content_start_y+140),
-                fill=(240, 240, 240))
-                
-            draw.rectangle(
-                (x+180, content_start_y+50, width-20, content_start_y+170),
-                fill=(245, 245, 250))
-        
+            self._draw_premium_browser_content(draw, x, y, width, height, title_height, url)
         elif game_window:
-            # Minecraft-style content
-            content_start_y = y+title_height+5
-            
-            # Game menu background
-            draw.rectangle(
-                (x+5, content_start_y, width-5, height-5),
-                fill=(60, 90, 60))
-                
-            # Menu options
-            options = ["Play Game", "Multiplayer", "Settings", "Quit Game"]
-            
-            for i, option in enumerate(options):
-                # Button
-                button_y = content_start_y + 40 + i * 50
-                draw.rounded_rectangle(
-                    (x+80, button_y, width-80, button_y+40),
-                    radius=4,
-                    fill=(80, 120, 80))
-                    
-                # Text
-                text_width = len(option) * 6
-                text_x = (width + x) // 2 - text_width // 2
-                draw.text(
-                    (text_x, button_y+15), 
-                    option, 
-                    fill=(240, 240, 240))
-                    
-            # Title
-            draw.text(
-                ((width + x) // 2 - 40, content_start_y+15), 
-                "MINECRAFT", 
-                fill=(240, 240, 240))
-        
+            self._draw_premium_game_content(draw, x, y, width, height, title_height)
+        elif doc_window:
+            self._draw_premium_document_content(draw, x, y, width, height, title_height)
         else:
-            # Standard window content - placeholder
-            # Sidebar
-            draw.rectangle(
-                (x+5, y+title_height+5, x+80, height-5),
-                fill=(245, 245, 250))
+            self._draw_premium_default_content(draw, x, y, width, height, title_height)
+            
+        return (x, y, width, height)
+    
+    def _draw_premium_browser_content(self, draw, x, y, width, height, title_height, url):
+        """Draw premium browser content"""
+        # Tab bar with premium styling
+        tab_bar_height = 36
+        tab_y = y + title_height
+        
+        # Tab bar background
+        draw.rectangle(
+            (x, tab_y, width, tab_y + tab_bar_height),
+            fill=(235, 238, 240))
+            
+        # Active tab
+        tab_width = 160
+        draw.rounded_rectangle(
+            (x+10, tab_y+4, x+10+tab_width, tab_y + tab_bar_height),
+            radius=6,
+            fill=(245, 248, 250))
+            
+        # Tab text
+        draw.text(
+            (x+25, tab_y+18),
+            "Khan Academy",
+            fill=(70, 80, 90))
+            
+        # Address bar with premium styling
+        address_y = tab_y + tab_bar_height + 5
+        address_height = 30
+        
+        # Address bar background
+        draw.rounded_rectangle(
+            (x+10, address_y, width-10, address_y + address_height),
+            radius=15,
+            fill=(240, 240, 240))
+            
+        # Security icon
+        draw.ellipse(
+            (x+20, address_y+8, x+28, address_y+22),
+            fill=(80, 180, 80))
+            
+        # URL
+        if url:
+            draw.text(
+                (x+35, address_y+15),
+                url,
+                fill=(40, 50, 60))
+        
+        # Content area
+        content_y = address_y + address_height + 10
+        
+        # Header banner
+        draw.rectangle(
+            (x+10, content_y, width-10, content_y+60),
+            fill=(2, 119, 189))
+            
+        draw.text(
+            (x+30, content_y+30),
+            "Khan Academy - Geometry Lesson",
+            fill=(255, 255, 255))
+            
+        # Content boxes
+        box_spacing = 15
+        box_width = (width - x - 30) // 2 - box_spacing
+        
+        # Left content column
+        left_x = x + 15
+        
+        # Navigation menu
+        draw.rounded_rectangle(
+            (left_x, content_y+70, left_x + box_width, content_y+200),
+            radius=4,
+            fill=(240, 240, 245))
+            
+        # Menu items
+        menu_items = ["Home", "Courses", "Geometry", "Triangles", "Circles", "Quadrilaterals"]
+        for i, item in enumerate(menu_items):
+            item_y = content_y + 85 + i * 20
+            
+            # Highlight active item
+            if i == 3:
+                draw.rectangle(
+                    (left_x+5, item_y-2, left_x + box_width-5, item_y+14),
+                    fill=(220, 225, 255))
+            
+            draw.text(
+                (left_x+15, item_y),
+                item,
+                fill=(60, 70, 80))
+        
+        # Right content - main area
+        right_x = left_x + box_width + box_spacing
+        
+        # Main content box
+        draw.rounded_rectangle(
+            (right_x, content_y+70, right_x + box_width, content_y+240),
+            radius=4,
+            fill=(250, 250, 255))
+            
+        # Content title
+        draw.text(
+            (right_x+15, content_y+85),
+            "Properties of Triangles",
+            fill=(40, 50, 60))
+            
+        # Content text lines
+        text_lines = ["A triangle is a polygon with", "three edges and three vertices.", 
+                      "The sum of the angles in a", "triangle is 180 degrees."]
+                      
+        for i, line in enumerate(text_lines):
+            draw.text(
+                (right_x+15, content_y+110 + i*18),
+                line,
+                fill=(70, 80, 90))
                 
-            # Content area with grid pattern
-            for i in range(0, 3):
-                for j in range(0, 4):
-                    draw.rounded_rectangle(
-                        (x+90 + j*90, y+title_height+10 + i*50, 
-                         x+170 + j*90, y+title_height+50 + i*50),
-                        radius=2,
-                        fill=(250, 250, 255),
-                        outline=(220, 225, 235))
+        # Simple triangle diagram
+        draw.polygon(
+            [(right_x+60, content_y+190), 
+             (right_x+120, content_y+190), 
+             (right_x+90, content_y+150)],
+            fill=(180, 200, 255),
+            outline=(100, 120, 240))
+    
+    def _draw_premium_game_content(self, draw, x, y, width, height, title_height):
+        """Draw premium game content"""
+        content_y = y + title_height
+        
+        # Game background - dark texture
+        draw.rectangle(
+            (x, content_y, width, height),
+            fill=(40, 50, 40))
+            
+        # Add texture pattern
+        for i in range(0, width-x, 4):
+            for j in range(0, height-content_y, 4):
+                if (i + j) % 8 == 0:
+                    draw.point(
+                        (x + i, content_y + j),
+                        fill=(30, 40, 30))
+        
+        # Game title
+        title_y = content_y + 40
+        
+        # Title shadow
+        draw.text(
+            (x + (width-x)//2, title_y+2),
+            "MINECRAFT",
+            fill=(0, 0, 0, 150),
+            anchor="mm")
+            
+        # Title text
+        draw.text(
+            (x + (width-x)//2, title_y),
+            "MINECRAFT",
+            fill=(220, 220, 220),
+            anchor="mm")
+            
+        # Menu buttons
+        buttons = [
+            "Single Player", "Multiplayer", "Minecraft Marketplace", 
+            "Options", "Quit Game"
+        ]
+        
+        button_width = 200
+        button_height = 36
+        button_x = x + (width-x)//2 - button_width//2
+        
+        for i, text in enumerate(buttons):
+            button_y = title_y + 70 + i * (button_height + 10)
+            
+            # Button shadow
+            draw.rounded_rectangle(
+                (button_x+2, button_y+2, button_x + button_width+2, button_y + button_height+2),
+                radius=4,
+                fill=(0, 0, 0, 100))
+                
+            # Button background
+            draw.rounded_rectangle(
+                (button_x, button_y, button_x + button_width, button_y + button_height),
+                radius=4,
+                fill=(60, 125, 60) if i == 0 else (80, 80, 80))
+                
+            # Button text
+            draw.text(
+                (button_x + button_width//2, button_y + button_height//2),
+                text,
+                fill=(240, 240, 240),
+                anchor="mm")
+                
+        # Bottom text
+        draw.text(
+            (x + (width-x)//2, height - 20),
+            "Copyright Mojang Studios",
+            fill=(200, 200, 200),
+            anchor="mm")
+    
+    def _draw_premium_document_content(self, draw, x, y, width, height, title_height):
+        """Draw premium document content"""
+        content_y = y + title_height
+        
+        # Toolbar
+        toolbar_height = 30
+        draw.rectangle(
+            (x, content_y, width, content_y + toolbar_height),
+            fill=(240, 240, 245))
+            
+        # Toolbar buttons
+        tools = ["File", "Edit", "View", "Insert", "Format", "Tools", "Help"]
+        current_x = x + 10
+        
+        for tool in tools:
+            # Button text
+            draw.text(
+                (current_x, content_y + toolbar_height//2),
+                tool,
+                fill=(70, 80, 90),
+                anchor="lm")
+                
+            # Update x position
+            current_x += len(tool) * 8 + 15
+            
+        # Document content area
+        doc_y = content_y + toolbar_height
+        
+        # Document background
+        draw.rectangle(
+            (x, doc_y, width, height),
+            fill=(255, 255, 255))
+            
+        # Document title
+        title_y = doc_y + 30
+        draw.text(
+            (x + 40, title_y),
+            "Research Notes: Geometric Principles",
+            fill=(20, 20, 20))
+            
+        # Horizontal rule
+        draw.line(
+            (x + 40, title_y + 20, width - 40, title_y + 20),
+            fill=(200, 200, 200),
+            width=1)
+            
+        # Document paragraphs
+        para_y = title_y + 40
+        
+        paragraphs = [
+            "The study of geometry involves understanding the properties,",
+            "measurement, and relationships of points, lines, angles, surfaces,",
+            "and solids. Key concepts include:",
+            "",
+            "1. Triangle properties - sum of angles equals 180 degrees",
+            "2. Circle principles - all points equidistant from center",
+            "3. Pythagorean theorem - relationship in right triangles",
+            "",
+            "Further research will explore applications in architecture and",
+            "engineering, where these principles form the foundation of design."
+        ]
+        
+        for i, para in enumerate(paragraphs):
+            draw.text(
+                (x + 40, para_y + i * 18),
+                para,
+                fill=(40, 40, 40))
+                
+        # Add document editor elements
+        
+        # Scrollbar
+        scrollbar_width = 12
+        draw.rectangle(
+            (width - scrollbar_width, doc_y, width, height),
+            fill=(240, 240, 245))
+            
+        # Scroll thumb
+        draw.rounded_rectangle(
+            (width - scrollbar_width + 2, doc_y + 20, width - 2, doc_y + 80),
+            radius=3,
+            fill=(180, 180, 190))
+        
+    def _draw_premium_default_content(self, draw, x, y, width, height, title_height):
+        """Draw default premium window content"""
+        content_y = y + title_height
+        
+        # Sidebar
+        sidebar_width = 80
+        draw.rectangle(
+            (x, content_y, x + sidebar_width, height),
+            fill=(245, 245, 250))
+            
+        # Sidebar icons
+        icon_y_positions = [content_y + 20, content_y + 60, content_y + 100, content_y + 140]
+        
+        for i, pos_y in enumerate(icon_y_positions):
+            # Icon background
+            icon_color = (220, 220, 230) if i % 2 == 0 else (200, 200, 220)
+            
+            draw.rounded_rectangle(
+                (x + 20, pos_y, x + 60, pos_y + 30),
+                radius=4,
+                fill=icon_color)
+        
+        # Main content
+        content_x = x + sidebar_width
+        
+        # Grid of items
+        grid_size = 70
+        grid_margin = 15
+        grid_cols = (width - content_x - grid_margin) // (grid_size + grid_margin)
+        grid_rows = (height - content_y - grid_margin) // (grid_size + grid_margin)
+        
+        for row in range(grid_rows):
+            for col in range(grid_cols):
+                item_x = content_x + grid_margin + col * (grid_size + grid_margin)
+                item_y = content_y + grid_margin + row * (grid_size + grid_margin)
+                
+                # Item background with slight variation
+                hue_variation = (row * grid_cols + col) * 20 % 60
+                
+                # Item box
+                draw.rounded_rectangle(
+                    (item_x, item_y, item_x + grid_size, item_y + grid_size),
+                    radius=4,
+                    fill=(240 - hue_variation, 245, 250))
     
     def _ensure_rgb_color(self, color):
         """Convert hex color to RGB tuple if needed"""
@@ -1388,7 +1736,7 @@ class FuturisticParentMonitorApp:
         return color
     
     def start_ambient_animation(self):
-        """Start sophisticated ambient animation effects for premium look and feel"""
+        """Start sophisticated ambient animation effects for ultra-premium look and feel"""
         # Animation variables for smooth transitions
         self.animation_values = {
             "pulse_phase": 0,           # For connection indicator
@@ -1401,17 +1749,47 @@ class FuturisticParentMonitorApp:
             "notification_dir": 1,      # Direction of alpha change
             "scan_line_pos": 0,         # Position for scan line effect
             "meter_dots_opacity": 50,   # Opacity for activity dots
-            "particle_positions": []    # For particle effect
+            "scanner_effect": 0,        # Scanner effect position
+            "scanner_dir": 1,           # Scanner direction
+            "glow_phase": 0,            # Phase for premium glow effects
+            "pulse_colors": [           # Premium color palette for effects
+                (37, 99, 235),          # Primary blue
+                (14, 165, 233),         # Cyan blue
+                (124, 58, 237),         # Purple
+                (31, 80, 150)           # Deep blue
+            ]
         }
-        
-        # Initialize particle effects
-        self.init_particles()
         
         def update_animation():
             # Update animation phases
             self.animation_values["pulse_phase"] = (self.animation_values["pulse_phase"] + 0.04) % (2 * math.pi)
             self.animation_values["activity_phase"] = (self.animation_values["activity_phase"] + 0.03) % (2 * math.pi)
             self.animation_values["scan_line_pos"] = (self.animation_values["scan_line_pos"] + 1) % self.screen_height
+            self.animation_values["glow_phase"] = (self.animation_values["glow_phase"] + 0.02) % (2 * math.pi)
+            
+            # Premium scanner effect
+            self.animation_values["scanner_effect"] += 2 * self.animation_values["scanner_dir"]
+            if self.animation_values["scanner_effect"] > 100:
+                self.animation_values["scanner_dir"] = -1
+            elif self.animation_values["scanner_effect"] < 0:
+                self.animation_values["scanner_dir"] = 1
+                
+            # Add premium scanner effect to main screen
+            if random.random() < 0.01:  # Occasionally show scanner
+                scanner_pos = int(self.screen_area[0] + 
+                               self.animation_values["scanner_effect"] / 100 * 
+                               (self.screen_area[2] - self.screen_area[0]))
+                
+                # Create vertical scanner line
+                scan_line = self.screen_canvas.create_line(
+                    scanner_pos, self.screen_area[1],
+                    scanner_pos, self.screen_area[3],
+                    fill=f"#{37:02x}{99:02x}{235:02x}",
+                    width=2,
+                    stipple="gray50")
+                    
+                # Schedule deletion
+                self.root.after(100, lambda line=scan_line: self.screen_canvas.delete(line))
             
             # More sophisticated pulse effect for connection indicator using dual sine waves
             pulse_size = 1.8 * math.sin(self.animation_values["pulse_phase"]) + 0.5 * math.sin(self.animation_values["pulse_phase"] * 2.3) + 1.0
@@ -1467,110 +1845,53 @@ class FuturisticParentMonitorApp:
                 else:  # Cyan dot pulses on low activity
                     dot_size = 2.5 + 1.5 * dot_pulse if activity_width <= 80 else 2
                 
-                # Update scan line effect - subtle line that passes over the screen
-                if self.animation_values["scan_line_pos"] % 200 < 30:
-                    scan_y = self.animation_values["scan_line_pos"] % 200
-                    scan_alpha = int(150 - scan_y * 5)
-                    if scan_alpha > 0:
-                        # Create temporary scan line - use regular RGB without alpha
-                        scan_line = self.screen_canvas.create_line(
-                            self.screen_area[0], self.screen_area[1] + scan_y,
-                            self.screen_area[2], self.screen_area[1] + scan_y,
-                            fill=f"#{100:02x}{160:02x}{255:02x}",  # Removed alpha channel
-                            width=1,
-                            stipple=self._get_stipple_pattern(scan_alpha))  # Use stipple for transparency
-                        # Schedule deletion
-                        self.root.after(30, lambda line=scan_line: self.screen_canvas.delete(line))
+            # Ultra-premium screen border glow effect
+            glow_color_idx = int(self.animation_values["glow_phase"] * 2) % len(self.animation_values["pulse_colors"])
+            next_idx = (glow_color_idx + 1) % len(self.animation_values["pulse_colors"])
             
-            # Update particle effects
-            self.update_particles()
+            # Interpolate between colors for smooth transition
+            progress = (self.animation_values["glow_phase"] * 2) % 1.0
+            r = int(self.animation_values["pulse_colors"][glow_color_idx][0] * (1-progress) + 
+                    self.animation_values["pulse_colors"][next_idx][0] * progress)
+            g = int(self.animation_values["pulse_colors"][glow_color_idx][1] * (1-progress) + 
+                    self.animation_values["pulse_colors"][next_idx][1] * progress)
+            b = int(self.animation_values["pulse_colors"][glow_color_idx][2] * (1-progress) + 
+                    self.animation_values["pulse_colors"][next_idx][2] * progress)
+            
+            # Create subtle glow around screen
+            if not hasattr(self, 'screen_glow'):
+                # Create initial glow
+                self.screen_glow = self.screen_canvas.create_rectangle(
+                    self.screen_area[0] - 2, self.screen_area[1] - 2,
+                    self.screen_area[2] + 2, self.screen_area[3] + 2,
+                    outline=f"#{r:02x}{g:02x}{b:02x}",
+                    width=2)
+            else:
+                # Update glow color
+                self.screen_canvas.itemconfig(
+                    self.screen_glow, 
+                    outline=f"#{r:02x}{g:02x}{b:02x}")
+            
+            # Update scan line effect - subtle line that passes over the screen
+            if self.animation_values["scan_line_pos"] % 200 < 30:
+                scan_y = self.animation_values["scan_line_pos"] % 200
+                scan_alpha = int(150 - scan_y * 5)
+                if scan_alpha > 0:
+                    # Create temporary scan line - use regular RGB without alpha
+                    scan_line = self.screen_canvas.create_line(
+                        self.screen_area[0], self.screen_area[1] + scan_y,
+                        self.screen_area[2], self.screen_area[1] + scan_y,
+                        fill=f"#{100:02x}{160:02x}{255:02x}",  # Removed alpha channel
+                        width=1,
+                        stipple=self._get_stipple_pattern(scan_alpha))  # Use stipple for transparency
+                    # Schedule deletion
+                    self.root.after(30, lambda line=scan_line: self.screen_canvas.delete(line))
             
             # Schedule next update
             self.root.after(30, update_animation)
         
         # Start animation
         update_animation()
-    
-    def init_particles(self):
-        """Initialize particle effect for premium animation"""
-        # Create particles for background animation
-        for _ in range(20):
-            x = random.randint(10, self.screen_width - 10)
-            y = random.randint(10, self.screen_height - 10)
-            size = random.uniform(1.0, 3.0)
-            speed = random.uniform(0.2, 1.0)
-            color = random.choice([
-                self.accent_primary, 
-                self.accent_tertiary,
-                "#ffffff"
-            ])
-            alpha = random.randint(20, 80)
-            
-            self.animation_values["particle_positions"].append({
-                "x": x, "y": y, "size": size, "speed": speed, 
-                "color": color, "alpha": alpha,
-                "id": None  # Will hold canvas item id
-            })
-    
-    def update_particles(self):
-        """Update particle effects for ambient animation"""
-        # Clean up existing particles
-        for particle in self.animation_values["particle_positions"]:
-            if particle["id"] is not None:
-                self.screen_canvas.delete(particle["id"])
-        
-        # Update and redraw particles
-        for particle in self.animation_values["particle_positions"]:
-            # Move particle upward with slight wobble
-            particle["y"] -= particle["speed"]
-            particle["x"] += math.sin(particle["y"] * 0.05) * 0.3
-            
-            # Reset if it goes out of bounds
-            if particle["y"] < 0:
-                particle["y"] = self.screen_height + 5
-                particle["x"] = random.randint(0, self.screen_width)
-            
-            # Draw particle with fading effect
-            # Calculate opacity based on position (fade near edges)
-            edge_distance = min(
-                particle["x"], self.screen_width - particle["x"],
-                particle["y"], self.screen_height - particle["y"]
-            )
-            fade_factor = min(1.0, edge_distance / 50.0)
-            opacity = int(particle["alpha"] * fade_factor)
-            
-            if opacity > 0:
-                # Extract RGB components from hex color
-                color = particle["color"]
-                if color.startswith('#'):
-                    r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
-                else:
-                    r, g, b = 255, 255, 255
-                
-                # Create particle with glow effect - use stipple for transparency
-                glow_size = particle["size"] * 2
-                
-                # Calculate stipple pattern based on opacity
-                glow_stipple = self._get_stipple_pattern(opacity // 4)
-                particle_stipple = self._get_stipple_pattern(opacity // 2)
-                
-                # Outer glow
-                particle["id"] = self.screen_canvas.create_oval(
-                    particle["x"] - glow_size, particle["y"] - glow_size,
-                    particle["x"] + glow_size, particle["y"] + glow_size,
-                    fill=f"#{r:02x}{g:02x}{b:02x}", 
-                    stipple=glow_stipple,
-                    outline="")
-                
-                # Inner particle
-                self.screen_canvas.create_oval(
-                    particle["x"] - particle["size"], 
-                    particle["y"] - particle["size"],
-                    particle["x"] + particle["size"], 
-                    particle["y"] + particle["size"],
-                    fill=f"#{r:02x}{g:02x}{b:02x}", 
-                    stipple=particle_stipple,
-                    outline="")
     
     def _get_stipple_pattern(self, opacity):
         """Return appropriate stipple pattern based on opacity"""

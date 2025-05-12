@@ -1400,7 +1400,6 @@ class FuturisticParentMonitorApp:
         # Active tab indication (assuming first tab is active by default in this drawing)
         # This visual detail should ideally be handled by switch_tab method based on current tab
         active_tab_width = apps_width // 2 # Assuming 2 tabs
-        active_tab_indicator_height = 3
 
         # Draw a background for the active tab text area to make it seem part of the main panel
         draw.rectangle(
@@ -1412,11 +1411,7 @@ class FuturisticParentMonitorApp:
         draw.rectangle((active_tab_width-10, 0, active_tab_width, tab_bar_height), fill=active_tab_bg_rgb + (250,)) # Ensure right side is square
         draw.rectangle((0, tab_bar_height-10, active_tab_width, tab_bar_height), fill=active_tab_bg_rgb + (250,)) # Ensure bottom is square with main panel
 
-
-        # Add accent underline for active tab
-        draw.rectangle(
-            (15, tab_bar_height - active_tab_indicator_height, active_tab_width - 15, tab_bar_height),
-            fill=accent_primary_rgb)
+        # Removed the static purple underline since we'll create a dynamic one in switch_tab
         
         # Subtle border for the main apps panel
         draw.rounded_rectangle(
@@ -1488,6 +1483,14 @@ class FuturisticParentMonitorApp:
             lambda e: self.on_tab_hover(self.history_tab_clickable, False))
         
         self.current_hover_rect = None # To store canvas item for hover effect
+        
+        # Add the initial active tab indicator (under APPS by default)
+        self.active_tab_indicator = self.apps_canvas.create_rectangle(
+            15, 45 - 3,  # x1, y1 (just below the tabs)
+            (self.apps_panel_width // 2) - 15, 45,  # x2, y2
+            fill=self.accent_primary,  # Purple underline
+            outline=""
+        )
 
     def on_tab_hover(self, tab_widget_tag, is_hovering):
         """Handle tab hover visual feedback."""
@@ -1551,7 +1554,7 @@ class FuturisticParentMonitorApp:
             40, 80, 45, 85, fill=self.secondary_text, width=1)
         
         # Search text - modern styling
-        self.apps_canvas.create_text(
+        self.search_text = self.apps_canvas.create_text(
             55, 75, text="Search applications...",
             font=self.caption, # Replace small_font_tk
             fill=self.secondary_text, anchor="w")
@@ -1965,46 +1968,87 @@ class FuturisticParentMonitorApp:
         # Determine which canvas to use
         canvas = self.apps_canvas
         
-        # Remove old tab indicator if it exists
+        # Get current tab indicator position
         if hasattr(self, 'active_tab_indicator'):
-            canvas.delete(self.active_tab_indicator)
-        
-        # Create new tab indicator at the appropriate position
-        if tab_name == "apps":
-            # Create indicator under the APPS tab
-            self.active_tab_indicator = canvas.create_rectangle(
-                15, 45 - 3,  # x1, y1 (just below the tabs)
-                (panel_width // 2) - 15, 45,  # x2, y2
-                fill=self.accent_primary,  # Purple underline
-                outline=""
+            current_coords = canvas.coords(self.active_tab_indicator)
+            
+            # Calculate target coordinates based on the selected tab
+            if tab_name == "apps":
+                # APPS tab - left side
+                target_x1 = 15
+                target_x2 = (panel_width // 2) - 15
+            else:
+                # HISTORY tab - right side
+                target_x1 = (panel_width // 2) + 15
+                target_x2 = panel_width - 15
+                
+            # The y coordinates remain the same
+            target_y1 = current_coords[1]
+            target_y2 = current_coords[3]
+            
+            # Animate the tab indicator's movement
+            def update_indicator_position(progress):
+                # Calculate current position based on progress
+                current_x1 = current_coords[0] + (target_x1 - current_coords[0]) * progress
+                current_x2 = current_coords[2] + (target_x2 - current_coords[2]) * progress
+                
+                # Update the indicator's position
+                canvas.coords(
+                    self.active_tab_indicator,
+                    current_x1, target_y1, current_x2, target_y2
+                )
+            
+            # Start the animation over 0.7 seconds with a smoother easing for better transition
+            self.animate(
+                "tab_indicator", 0.0, 1.0, 0.7,
+                update_indicator_position, "ease_in_out_cubic"
             )
-        else:  # history tab
-            # Create indicator under the HISTORY tab
-            self.active_tab_indicator = canvas.create_rectangle(
-                (panel_width // 2) + 15, 45 - 3,  # x1, y1 (just below the tabs)
-                panel_width - 15, 45,  # x2, y2
-                fill=self.accent_primary,  # Purple underline
-                outline=""
-            )
+        else:
+            # Create new tab indicator if it doesn't exist yet
+            if tab_name == "apps":
+                # Create indicator under the APPS tab
+                self.active_tab_indicator = canvas.create_rectangle(
+                    15, 45 - 3,  # x1, y1 (just below the tabs)
+                    (panel_width // 2) - 15, 45,  # x2, y2
+                    fill=self.accent_primary,  # Purple underline
+                    outline=""
+                )
+            else:  # history tab
+                # Create indicator under the HISTORY tab
+                self.active_tab_indicator = canvas.create_rectangle(
+                    (panel_width // 2) + 15, 45 - 3,  # x1, y1 (just below the tabs)
+                    panel_width - 15, 45,  # x2, y2
+                    fill=self.accent_primary,  # Purple underline
+                    outline=""
+                )
         
         try:
             if tab_name == "apps":
-                # Update tab colors
+            # Update tab colors
                 canvas.itemconfig("apps_tab_text", font=self.subtitle, fill=self.accent_primary)
                 canvas.itemconfig("history_tab_text", font=self.button, fill=self.secondary_text)
-                
+            
                 # Show apps container, hide history container
                 canvas.itemconfig(self.apps_container_window, state="normal")
                 canvas.itemconfig(self.history_container_window, state="hidden")
+                
+                # Update search text
+                if hasattr(self, 'search_text'):
+                    canvas.itemconfig(self.search_text, text="Search applications...")
                 
             elif tab_name == "history":
                 # Update tab colors
                 canvas.itemconfig("apps_tab_text", font=self.button, fill=self.secondary_text)
                 canvas.itemconfig("history_tab_text", font=self.subtitle, fill=self.accent_primary)
-                
+            
                 # Show history container, hide apps container
                 canvas.itemconfig(self.apps_container_window, state="hidden")
                 canvas.itemconfig(self.history_container_window, state="normal")
+                
+                # Update search text
+                if hasattr(self, 'search_text'):
+                    canvas.itemconfig(self.search_text, text="Search history...")
+            
         except Exception as e:
             print(f"Error switching tabs: {e}")
             # Revert to previous tab if there was an error

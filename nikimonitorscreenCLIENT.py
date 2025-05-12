@@ -127,6 +127,9 @@ class GuardianClientMonitor:
             try:
                 logging.info(f"Connecting to server at {self.server_ip}:{self.server_port}...")
                 
+                # Show loading animation
+                self.show_loading_bar()
+                
                 # Create a new socket
                 self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.socket.settimeout(10)  # Set a timeout for connection attempts
@@ -162,6 +165,102 @@ class GuardianClientMonitor:
                 
                 # Wait before trying again
                 time.sleep(self.reconnect_delay)
+    
+    def show_loading_bar(self):
+        """Show a loading bar animation in a small window"""
+        try:
+            # Create a window for the loading bar
+            loading_window = Tk()
+            loading_window.title("Guardian Client")
+            loading_window.geometry("400x150")
+            loading_window.configure(bg="#050A10")
+            loading_window.attributes("-topmost", True)
+            loading_window.overrideredirect(True)  # Remove window borders
+            
+            # Center the window on screen
+            screen_width = loading_window.winfo_screenwidth()
+            screen_height = loading_window.winfo_screenheight()
+            x = (screen_width - 400) // 2
+            y = (screen_height - 150) // 2
+            loading_window.geometry(f"400x150+{x}+{y}")
+            
+            # Create a canvas for drawing
+            canvas = Canvas(loading_window, bg="#050A10", highlightthickness=0)
+            canvas.pack(fill=BOTH, expand=True)
+            
+            # Helper function to create rounded rectangle
+            def create_rounded_rectangle(x1, y1, x2, y2, radius=25, **kwargs):
+                points = [
+                    x1+radius, y1,
+                    x2-radius, y1,
+                    x2, y1,
+                    x2, y1+radius,
+                    x2, y2-radius,
+                    x2, y2,
+                    x2-radius, y2,
+                    x1+radius, y2,
+                    x1, y2,
+                    x1, y2-radius,
+                    x1, y1+radius,
+                    x1, y1
+                ]
+                return canvas.create_polygon(points, **kwargs, smooth=True)
+            
+            # Draw rounded rectangle for the container
+            create_rounded_rectangle(10, 10, 390, 140, radius=15, fill="#0E1620", outline="#2A3648", width=1)
+            
+            # Loading text
+            canvas.create_text(200, 40, text="GUARDIAN", fill="#5D4FFF", font=("Arial", 16, "bold"))
+            canvas.create_text(200, 65, text="Connecting to monitoring service...", fill="#A8BCDB", font=("Arial", 10))
+            
+            # Progress bar background
+            canvas.create_rectangle(40, 90, 360, 98, fill="#1F2738", outline="")
+            
+            # Progress bar that animates
+            progress_bar = canvas.create_rectangle(40, 90, 40, 98, fill="#5D4FFF", outline="")
+            
+            # Status text
+            status_text = canvas.create_text(200, 120, text="Initializing connection...", fill="#667A95", font=("Arial", 9))
+            
+            # Status messages to cycle through
+            status_messages = [
+                "Initializing connection...",
+                "Establishing secure channel...",
+                "Loading monitoring modules...",
+                "Preparing data streams...",
+                "Activating oversight protocols...",
+                "Connection established!"
+            ]
+            
+            # Animation function
+            def animate_progress():
+                nonlocal progress_width
+                if progress_width < 320:
+                    progress_width += 4
+                    canvas.coords(progress_bar, 40, 90, 40 + progress_width, 98)
+                    
+                    # Update status message based on progress
+                    progress_percent = progress_width / 320
+                    message_idx = min(int(progress_percent * len(status_messages)), len(status_messages) - 1)
+                    canvas.itemconfig(status_text, text=status_messages[message_idx])
+                    
+                    loading_window.after(50, animate_progress)
+                else:
+                    # When animation completes, destroy the window
+                    loading_window.after(500, loading_window.destroy)
+            
+            # Start with zero progress
+            progress_width = 0
+            
+            # Start animation
+            loading_window.after(100, animate_progress)
+            
+            # Run the window
+            loading_window.mainloop()
+            
+        except Exception as e:
+            logging.error(f"Failed to show loading animation: {e}")
+            # Continue with connection even if animation fails
     
     def listen_for_commands(self):
         """Listen for commands from the server"""
